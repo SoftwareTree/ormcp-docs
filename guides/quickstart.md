@@ -20,7 +20,7 @@ Before starting, ensure you have:
 
 ### 1. Scope Your Data
 
-Define lightweight object models for your relevant data and write an ORM specification using JDX grammar.
+Define lightweight object models for your relevant data and write a declarative ORM specification.
 
 **For this quick start, we'll use a pre-built example.**
 
