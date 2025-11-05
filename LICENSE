@@ -1,0 +1,88 @@
+ORMCP Documentation License
+
+Copyright (c) 2025 Software Tree, LLC
+All Rights Reserved
+
+This documentation repository contains technical documentation, guides, API 
+references, and other materials for ORMCP Server, a proprietary product of 
+Software Tree, LLC.
+
+PROPRIETARY TECHNOLOGY
+
+The ORMCP Server API, its tools, methods, and operational specifications 
+(including but not limited to the MCP Tools API Reference) are proprietary 
+technologies of Software Tree, LLC. All intellectual property rights in the 
+API design, architecture, and specifications are owned exclusively by 
+Software Tree, LLC.
+
+PERMITTED USE OF DOCUMENTATION
+
+You may:
+- Read and reference this documentation for using ORMCP Server
+- Link to this documentation from your projects, websites, and applications
+- Share links to this documentation freely to help others discover ORMCP Server
+- Use code examples provided in this documentation in your ORMCP Server 
+  implementations, subject to your ORMCP Server license terms
+- Reference and cite this documentation in technical articles, blog posts, 
+  and educational materials with proper attribution
+
+RESTRICTIONS
+
+You may not:
+- Republish, redistribute, or create derivative documentation products
+- Use this documentation or API specifications to create competing products 
+  or services
+- Extract or reuse API specifications for purposes other than using ORMCP Server
+- Remove or alter copyright notices or proprietary markings
+- Use this documentation in any way that violates your ORMCP Server license
+
+THE SOFTWARE ITSELF
+
+This repository contains documentation only. ORMCP Server software is licensed 
+separately under its own proprietary license terms. To obtain and use ORMCP Server:
+- Beta users: Request evaluation access at https://www.softwaretree.com/products/ormcp
+- Production users: Commercial licensing terms will be announced at the time of 
+  commercial release. For information or to express interest, contact Software Tree.
+- Email: ormcp_support@softwaretree.com
+- Web: https://www.softwaretree.com
+
+DISCLAIMER
+
+This documentation and all associated materials (including, without limitation, 
+any guides, API references, code examples, or other content provided herein) 
+are provided "AS IS" without warranty of any kind, express or implied, including 
+but not limited to warranties of merchantability, fitness for a particular 
+purpose, accuracy, completeness, or non-infringement.
+
+LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL SOFTWARE TREE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, 
+SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO 
+DAMAGES FOR LOSS OF PROFITS, REVENUE, DATA, OR USE, EVEN IF ADVISED OF THE 
+POSSIBILITY OF SUCH DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT 
+(INCLUDING NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, ARISING OUT OF OR 
+IN CONNECTION WITH THIS DOCUMENTATION OR ITS USE OR INABILITY TO BE USED.
+
+SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CONSEQUENTIAL DAMAGES, 
+SO THE ABOVE LIMITATION MAY NOT APPLY TO YOU.
+
+UPDATES AND CHANGES
+
+Software Tree reserves the right to update, modify, or discontinue any part 
+of this documentation at any time without notice. Your continued use of this 
+documentation after changes constitutes acceptance of those changes.
+
+GOVERNING LAW
+
+This Agreement and the rights of the Parties hereunder shall be governed by and 
+interpreted in accordance with the laws of the State of California, without 
+regard to its conflicts of law principles. The Parties agree that any appropriate 
+state or federal district court located in Santa Clara County, California, shall 
+have exclusive jurisdiction over any case or controversy arising hereunder and 
+shall be the proper forum in which to adjudicate such case or controversy.
+
+CONTACT
+
+For questions about this documentation license:
+Email: ormcp_support@softwaretree.com
+Web: https://www.softwaretree.com

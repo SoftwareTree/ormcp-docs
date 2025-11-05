@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.bak
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# ---------------------------
+# Media/image files
+# ---------------------------
+*.png
+*.jpg
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+.~lock.*
+
+# Local development
+.env
+.env.*
+*.env
+Notes/
+notes/
+TODO.md
+scratch/
+temp/
+
+# ---------------------------
+# Environment/config
+# ---------------------------
+.env
+.env.*
+*.env
+
+
