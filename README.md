@@ -83,7 +83,7 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
 
 **1. Scope Your Data**
 - Define lightweight object models for your relevant data
-- Write an ORM specification for those models using JDX grammar
+- Write a declarative ORM specification for those models in a text file using a simple (JDX) grammar
 
 **2. Build Your Gilhari Microservice**
 - Add models, ORM spec, and JDBC driver to a Dockerfile
