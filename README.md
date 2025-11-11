@@ -86,7 +86,7 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
 - Write a declarative ORM specification for those models in a text file using a simple (JDX) grammar
 
 **2. Build Your Gilhari Microservice**
-- Add models, ORM spec, and JDBC driver to a Dockerfile
+- Add models, ORM specification, and JDBC driver to a Dockerfile
 - Build the Gilhari Docker image
 
 **3. Run with ORMCP**
@@ -1248,7 +1248,8 @@ pytest
 
 * **ORMCP Server** leverages **Gilhari software**, a RESTful microservice framework for JSON data integration with databases.
 * You first create a custom Gilhari microservice based on the object relational data models of your application.
-* The object relational mapping (ORM) specification is defined declaratively in a text file (.jdx) based on a simple grammar.
+* An object relational mapping (ORM) specification defines and controls the scope and shape of your object model corresponding to your relational model. 
+* The ORM specification is defined declaratively in a text file (.jdx) based on a simple grammar.
 * You may be able to reverse-engineer ORM specification from an existing database schema using tools/examples provided with Gilhari SDK. Check the `examples\JDX_ReverseEngineeringJSONExample` directory.
 * For details on creating custom Gilhari microservices, refer to the Gilhari SDK documentation included in the source distribution package.
 * Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI_BASE_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls.
