@@ -71,6 +71,7 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
          |     JSON result (MCP format)   |                                 |
          |<-------------------------------|                                 |
 ```
+**Important:** The AI application (LLM client) translates natural language into MCP tool calls. ORMCP Server then translates these MCP tool calls into REST API calls to Gilhari.
 
 **ORMCP Server** bridges the gap between modern AI applications and relational databases through:
 - **MCP Protocol**: Standardized AI-to-tool communication
