@@ -1,6 +1,6 @@
 Copyright (c) 2025, Software Tree
 
-# ORMCP Server - Beta (v 0.4.6)
+# ORMCP Server - Beta
 
 *A Model Context Protocol (MCP) Server to connect your AI applications to relational databases*
 
