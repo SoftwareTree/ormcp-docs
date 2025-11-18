@@ -1175,6 +1175,36 @@ curl -G "http://localhost:80/gilhari/v1/A?deep=false" \
 
 ## Compilation and Build
 
+### Running Shell Scripts on Mac/Linux
+
+After cloning an example repository or extracting the SDK, shell scripts may not have execute permissions.
+
+**If you encounter permission errors:**
+```bash
+zsh: permission denied: ./build.sh
+```
+
+**Solution 1: Add execute permissions**
+```bash
+chmod +x build.sh compile.sh run_docker_app.sh
+./build.sh
+```
+
+**Solution 2: Run with sh directly**
+```bash
+sh build.sh
+sh compile.sh
+sh run_docker_app.sh
+```
+
+**Why this happens:** Shell script execute permissions may not be preserved when:
+- Extracting from ZIP/JAR archives
+- Cloning on Windows and checking out on Mac/Linux
+- Downloading source distributions
+
+**Note:** We've configured our Git repositories to preserve execute permissions, but they may still be lost in certain distribution methods.
+
+
 ### Step 1: Prepare Source Files
 
 Create `sources.txt` listing all container class source files:
