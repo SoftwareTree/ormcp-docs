@@ -124,6 +124,18 @@ pip show ormcp-server
 
 Replace `YOUR_TOKEN` with your beta access token.
 
+> **📌 Linux/Mac Users:** Modern Linux distributions require virtual environments. See [troubleshooting](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error) if you get "externally-managed-environment" errors.
+```bash
+# Create virtual environment (required on modern Linux)
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install with token
+pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
+
 **For Production Users (PyPI):**
 
 ```bash
