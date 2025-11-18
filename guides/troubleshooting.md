@@ -4,16 +4,27 @@ Copyright (c) 2025, Software Tree
 
 Solutions to common issues and problems.
 
+> **💡 Quick Navigation:** Jump directly to your issue using the table of contents below.
+
 ---
 
 ## Table of Contents
 
 - [Installation Issues](#installation-issues)
+  - [Externally Managed Environment Error](#externally-managed-environment-error)
+  - [Python Version Issues](#python-version-issues)
+  - [Virtual Environment Setup Issues](#virtual-environment-setup-issues)
+  - [Command Not Found](#command-not-found)
+  - [401 Unauthorized Error (Gemfury)](#401-unauthorized-error-gemfury)
+  - [Empty Executable File (0 bytes)](#empty-executable-file-0-bytes)
+  - [Missing Dependencies](#missing-dependencies)
+  - [SSL Certificate Error](#ssl-certificate-error)
 - [Connection Problems](#connection-problems)
 - [Configuration Issues](#configuration-issues)
 - [Runtime Errors](#runtime-errors)
 - [Performance Problems](#performance-problems)
 - [Platform-Specific Issues](#platform-specific-issues)
+- [Gilhari Example Issues](#gilhari-example-issues)
 - [Debug Mode](#debug-mode)
 - [Getting Help](#getting-help)
 
@@ -21,23 +32,183 @@ Solutions to common issues and problems.
 
 ## Installation Issues
 
-### Empty Executable File (0 bytes)
+> **🎯 Most Common Issues:**
+> - [Externally managed environment (Linux)](#externally-managed-environment-error)
+> - [Command not found](#command-not-found)
+> - [401 Unauthorized (token)](#401-unauthorized-error-gemfury)
 
-**Problem:** The `ormcp-server.exe` file is 0 bytes and won't run.
+---
 
-**Cause:** Antivirus interference or file system issues during installation.
+### Externally Managed Environment Error
 
-**Solution:**
+**Problem:** Error when running `pip install` or `pip3 install`:
+
+```
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+```
+
+**Cause:** Modern Linux distributions (Ubuntu 23.04+, Debian 12+, Fedora 38+) prevent installing packages system-wide with pip to avoid conflicts with the system package manager (PEP 668).
+
+**Solution: Use Virtual Environment (Recommended)**
+
 ```bash
-# Uninstall
-pip uninstall ormcp-server
+# Create virtual environment
+python3 -m venv .venv
 
-# Reinstall
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ormcp-server
+# Activate it
+source .venv/bin/activate
 
-# Verify
-pip show ormcp-server
-ormcp-server --help
+# Now install ORMCP Server
+pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
+
+**Alternative: Use pipx (for command-line tools)**
+
+```bash
+# Install pipx if needed
+sudo apt install pipx  # Ubuntu/Debian
+# or
+sudo dnf install pipx  # Fedora
+
+# Install ORMCP Server with pipx
+pipx install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --pip-args="--extra-index-url https://pypi.org/simple" \
+  ormcp-server
+```
+
+**Not Recommended: Override with --break-system-packages**
+
+```bash
+# Only use if you understand the risks
+pip3 install --break-system-packages \
+  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
+
+⚠️ **Warning:** This can cause conflicts with system packages and break your Python installation. Always prefer virtual environments or pipx.
+
+**Related Issues:**
+- If venv module is missing, see [Virtual Environment Setup Issues](#virtual-environment-setup-issues)
+- If wrong Python version, see [Python Version Issues](#python-version-issues)
+
+---
+
+### Python Version Issues
+
+**Problem:** `pip3 install` uses wrong Python version or can't find ORMCP Server
+
+**Symptoms:**
+- Installation succeeds but ORMCP Server requires Python 3.12+
+- `pip3 --version` shows Python 3.9 or older
+- Package installs but won't run
+
+**Diagnosis:**
+
+```bash
+# Check your Python versions
+python --version
+python3 --version
+python3.12 --version
+
+# Check which pip is being used
+pip3 --version
+# Should show: pip X.X.X from /path/to/python3.12/...
+```
+
+**Solutions:**
+
+**1. Install Python 3.12+ if missing:**
+
+**Ubuntu/Debian:**
+```bash
+sudo apt update
+sudo apt install python3.12 python3.12-venv python3-pip
+```
+
+**Fedora:**
+```bash
+sudo dnf install python3.12
+```
+
+**macOS:**
+```bash
+brew install python@3.12
+```
+
+**2. Use Python 3.12 explicitly:**
+
+```bash
+# Create virtual environment with Python 3.12
+python3.12 -m venv .venv
+source .venv/bin/activate
+
+# pip will now use Python 3.12
+pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
+
+**3. Use python3.12 -m pip directly:**
+
+```bash
+# Instead of pip3 install, use:
+python3.12 -m pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
+
+---
+
+### Virtual Environment Setup Issues
+
+**Problem:** `python3 -m venv` fails or venv module not found
+
+**Error messages:**
+- `No module named venv`
+- `The virtual environment was not created successfully`
+- `ensurepip is not available`
+
+**Solutions:**
+
+**Ubuntu/Debian:**
+```bash
+# Install venv module for your Python version
+sudo apt install python3.12-venv
+
+# Then create virtual environment
+python3.12 -m venv .venv
+source .venv/bin/activate
+```
+
+**Fedora:**
+```bash
+sudo dnf install python3-virtualenv
+python3.12 -m venv .venv
+source .venv/bin/activate
+```
+
+**macOS (if using system Python):**
+```bash
+# Use Homebrew Python instead
+brew install python@3.12
+/opt/homebrew/bin/python3.12 -m venv .venv
+source .venv/bin/activate
+```
+
+**Verify virtual environment is active:**
+```bash
+# Should show path within .venv directory
+which python
+# or
+where python  # Windows
 ```
 
 ---
@@ -46,9 +217,14 @@ ormcp-server --help
 
 **Problem:** `ormcp-server: command not found` or `'ormcp-server' is not recognized`
 
+**Symptoms:**
+- Installation succeeded but command doesn't work
+- `ormcp-server` not in PATH
+
 **Solutions:**
 
-**1. Find Installation Location:**
+**1. Find installation location:**
+
 ```bash
 # Windows (PowerShell)
 (Get-Command ormcp-server -ErrorAction SilentlyContinue).Source
@@ -59,28 +235,35 @@ where ormcp-server
 # Linux/Mac
 which ormcp-server
 
-# Any platform
+# Any platform using pip
 pip show -f ormcp-server | grep ormcp-server
 ```
 
-**2. Add to PATH:**
+**2. Add Scripts directory to PATH:**
 
-**Windows:**
+**Windows (PowerShell as Administrator):**
 ```powershell
-# PowerShell (as Administrator, then restart terminal)
 setx PATH "$env:PATH;$env:APPDATA\Python\Python313\Scripts"
+# Then restart terminal
 ```
+
+**Windows (Manual via Control Panel):**
+1. Search "Environment Variables" in Start Menu
+2. Edit "PATH" variable
+3. Add: `C:\Users\<YourUsername>\AppData\Roaming\Python\Python313\Scripts`
+4. Click OK and restart terminal
 
 **Linux/Mac:**
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.local/bin:$PATH"
 
-# Reload
+# Reload shell
 source ~/.bashrc  # or source ~/.zshrc
 ```
 
-**3. Use Full Path:**
+**3. Use full path:**
+
 ```bash
 # Windows
 %APPDATA%\Python\Python313\Scripts\ormcp-server.exe
@@ -89,9 +272,16 @@ source ~/.bashrc  # or source ~/.zshrc
 ~/.local/bin/ormcp-server
 ```
 
-**4. Use Python Module:**
+**4. Use Python module directly:**
+
 ```bash
 python -m ormcp_server
+```
+
+**Note:** If you installed in a virtual environment, make sure it's activated:
+```bash
+source .venv/bin/activate  # Linux/Mac
+.venv\Scripts\activate     # Windows
 ```
 
 ---
@@ -100,30 +290,75 @@ python -m ormcp_server
 
 **Problem:** `401 Unauthorized` when installing from Gemfury
 
+**Symptoms:**
+- `HTTP Error 401: Unauthorized`
+- Cannot access package index
+
 **Solutions:**
 
-1. **Verify Token:**
-   - Check you copied the complete token
-   - Ensure no extra spaces or characters
-   - Try pasting in a text editor first
+**1. Verify token:**
+- Check you copied the complete token (no extra spaces)
+- Ensure token hasn't expired
+- Try pasting in text editor first to check for hidden characters
 
-2. **Check Token Expiration:**
-   - Request new token if expired
-   - Contact ormcp_support@softwaretree.com
+**2. Use correct command format:**
 
-3. **Use Direct URL:**
-   ```bash
-   pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ormcp-server
-   ```
+```bash
+# Ensure both --index-url and --extra-index-url are included
+pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+```
 
-4. **Check pip Configuration:**
-   ```bash
-   # Linux/Mac
-   cat ~/.pip/pip.conf
-   
-   # Windows
-   type %APPDATA%\pip\pip.ini
-   ```
+**3. Request new token:**
+- Contact ormcp_support@softwaretree.com
+- Visit https://www.softwaretree.com to request new beta access
+
+**4. Check pip configuration:**
+
+Ensure no conflicting configuration:
+
+```bash
+# Linux/Mac
+cat ~/.pip/pip.conf
+
+# Windows
+type %APPDATA%\pip\pip.ini
+```
+
+Remove any conflicting `index-url` settings.
+
+---
+
+### Empty Executable File (0 bytes)
+
+**Problem:** The `ormcp-server.exe` file is 0 bytes and won't run
+
+**Cause:** Antivirus interference or file system issues during installation
+
+**Solution:**
+
+```bash
+# Uninstall
+pip uninstall ormcp-server
+
+# Clear pip cache
+pip cache purge
+
+# Reinstall
+pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
+
+# Verify
+pip show ormcp-server
+ormcp-server --help
+```
+
+**If problem persists:**
+- Temporarily disable antivirus during installation
+- Check disk space
+- Try installing in a different location (virtual environment)
 
 ---
 
@@ -131,17 +366,34 @@ python -m ormcp_server
 
 **Problem:** `ModuleNotFoundError: No module named 'requests'` or similar
 
+**Symptoms:**
+- ORMCP Server installs but won't run
+- Import errors when starting server
+
 **Solution:**
+
 ```bash
 # Reinstall with force
-pip install --force-reinstall --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ormcp-server
-
-# Or install missing dependency
-pip install requests
+pip install --force-reinstall \
+  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
 
 # Verify dependencies
 pip show ormcp-server
 # Should show: fastmcp, httpx, mcp, pydantic, uvicorn, requests
+```
+
+**If specific dependency is missing:**
+```bash
+# Install missing dependency
+pip install requests  # or other missing package
+
+# Then reinstall ORMCP Server
+pip install --force-reinstall \
+  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
 ```
 
 ---
@@ -152,15 +404,22 @@ pip show ormcp-server
 
 **Solutions:**
 
-**1. Update Certificates:**
+**1. Update certificates:**
 ```bash
 pip install --upgrade certifi
 ```
 
-**2. Temporary Bypass (not recommended for production):**
+**2. Temporary bypass (not recommended for production):**
 ```bash
-pip install --trusted-host pypi.fury.io --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ormcp-server
+pip install --trusted-host pypi.fury.io \
+  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
+  --extra-index-url https://pypi.org/simple \
+  ormcp-server
 ```
+
+**3. Check system time:**
+- Ensure system date/time is correct
+- Incorrect time can cause SSL certificate validation failures
 
 ---
 
@@ -171,16 +430,18 @@ pip install --trusted-host pypi.fury.io --index-url https://YOUR_TOKEN@pypi.fury
 **Problem:** ORMCP can't connect to Gilhari microservice
 
 **Diagnosis:**
+
 ```bash
 # Test Gilhari directly
 curl http://localhost:80/gilhari/v1/health/check
 
-# Expected: 200 OK
+# Expected: 200 OK response
 ```
 
 **Solutions:**
 
-**1. Verify Gilhari is Running:**
+**1. Verify Gilhari is running:**
+
 ```bash
 docker ps | grep gilhari
 
@@ -188,7 +449,8 @@ docker ps | grep gilhari
 docker run -p 80:8081 gilhari_example1:1.0
 ```
 
-**2. Check Port:**
+**2. Check port availability:**
+
 ```bash
 # Verify port 80 is accessible
 # Windows
@@ -199,6 +461,7 @@ lsof -i :80
 ```
 
 **3. Verify GILHARI_BASE_URL:**
+
 ```bash
 # Linux/Mac
 echo $GILHARI_BASE_URL
@@ -212,7 +475,8 @@ echo $env:GILHARI_BASE_URL
 # Should be: http://localhost:80/gilhari/v1/
 ```
 
-**4. Try Different Port:**
+**4. Try different port:**
+
 ```bash
 # Run Gilhari on different port
 docker run -p 8888:8081 gilhari_example1:1.0
@@ -221,7 +485,8 @@ docker run -p 8888:8081 gilhari_example1:1.0
 export GILHARI_BASE_URL="http://localhost:8888/gilhari/v1/"
 ```
 
-**5. Check Docker Network:**
+**5. Check Docker network:**
+
 ```bash
 # List Docker networks
 docker network ls
@@ -237,6 +502,7 @@ docker network inspect bridge
 **Problem:** Gilhari can't connect to database
 
 **Check Gilhari Logs:**
+
 ```bash
 # Get container ID
 docker ps
@@ -259,6 +525,7 @@ ENV DB_PASSWORD=correct_password
 ```
 
 **2. Database Not Accessible:**
+
 ```bash
 # Test database connection
 # PostgreSQL
@@ -269,6 +536,7 @@ mysql -h localhost -u myuser -p mydb
 ```
 
 **3. Missing JDBC Driver:**
+
 ```bash
 # Ensure JDBC driver is in Docker image
 docker exec <container-id> ls /app/drivers/
@@ -315,9 +583,10 @@ docker exec <container-id> ls /app/drivers/
 **Common JSON Errors:**
 - Trailing comma after last item
 - Missing quotes around strings
-- Backslash not escaped in Windows paths
+- Backslash not escaped in Windows paths (use `\\` or `/`)
 
 **3. Verify Command Path:**
+
 ```bash
 # Find ormcp-server location
 # Windows
@@ -350,6 +619,7 @@ which ormcp-server
 **Problem:** ORMCP starts but can't find Gilhari
 
 **Verify Variables:**
+
 ```bash
 # Linux/Mac
 env | grep GILHARI
@@ -408,6 +678,7 @@ Add to config file (variables set per-server):
 **Problem:** ORMCP connects to wrong port
 
 **Check Port Mapping:**
+
 ```bash
 # See where Gilhari is listening
 docker ps
@@ -452,7 +723,7 @@ curl http://localhost:80/gilhari/v1/getObjectModelSummary/now
 - Use SQL-like WHERE clause syntax
 - Check for proper quote escaping
 - Valid: `state='CA' AND age >= 30`
-- Invalid: `state=CA AND age >= 30` (missing quotes)
+- Invalid: `state=CA AND age >= 30` (missing quotes around string values)
 
 **3. Primary Key Violation:**
 
@@ -481,6 +752,7 @@ curl http://localhost:80/gilhari/v1/getObjectModelSummary/now
 **Solutions:**
 
 **1. Increase Timeout:**
+
 ```bash
 # Set longer timeout (seconds)
 export GILHARI_TIMEOUT=60
@@ -515,6 +787,7 @@ export GILHARI_TIMEOUT=60
 **Solutions:**
 
 **1. Limit Result Size:**
+
 ```json
 {
   "name": "query",
@@ -530,6 +803,7 @@ export GILHARI_TIMEOUT=60
 - Process and discard before fetching next chunk
 
 **3. Increase Docker Memory:**
+
 ```bash
 # Run with more memory
 docker run -m 2g -p 80:8081 gilhari_example1:1.0
@@ -544,6 +818,7 @@ docker run -m 2g -p 80:8081 gilhari_example1:1.0
 **Diagnosis:**
 
 **1. Enable Debug Logging:**
+
 ```bash
 export LOG_LEVEL=DEBUG
 ormcp-server
@@ -561,6 +836,7 @@ Rebuild and check logs for generated SQL.
 **Solutions:**
 
 **1. Add Database Indexes:**
+
 ```sql
 -- For frequently filtered columns
 CREATE INDEX idx_users_state ON users(state);
@@ -569,6 +845,7 @@ CREATE INDEX idx_orders_date ON orders(order_date);
 ```
 
 **2. Use Projections:**
+
 ```json
 {
   "operationDetails": "[{\"opType\":\"projections\",\"projectionsDetails\":[{\"type\":\"User\",\"attribs\":[\"name\",\"email\"]}]}]"
@@ -589,6 +866,7 @@ CREATE INDEX idx_orders_date ON orders(order_date);
 **Solutions:**
 
 **1. Use Shallow Queries:**
+
 ```json
 {
   "deep": false  // Don't retrieve related objects
@@ -604,6 +882,7 @@ CREATE INDEX idx_orders_date ON orders(order_date);
 - Reduces data transmission
 
 **4. Limit Results:**
+
 ```json
 {
   "maxObjects": 10  // Don't return all records
@@ -632,6 +911,7 @@ CREATE INDEX idx_orders_date ON orders(order_date);
    - `C:\Users\<YourUser>\AppData\Local\Programs\Python\Python313\Scripts\`
 
 **3. Use py Launcher:**
+
 ```cmd
 py -3.12 -m ormcp_server
 ```
@@ -643,6 +923,7 @@ py -3.12 -m ormcp_server
 **Problem:** Permission denied when running ormcp-server
 
 **Solution:**
+
 ```bash
 # Make executable
 chmod +x ~/.local/bin/ormcp-server
@@ -658,9 +939,79 @@ python -m ormcp_server
 **Problem:** macOS blocks execution due to unidentified developer
 
 **Solution:**
+
 1. Open System Preferences → Security & Privacy
 2. Click "Allow Anyway" for ormcp-server
 3. Or run: `xattr -d com.apple.quarantine ~/.local/bin/ormcp-server`
+
+---
+
+## Gilhari Example Issues
+
+### Shell Script Permission Denied
+
+**Problem:** Cannot execute shell scripts on Mac/Linux
+
+**Error:**
+```bash
+zsh: permission denied: ./build.sh
+bash: ./compile.sh: Permission denied
+```
+
+**Solutions:**
+
+**Option 1: Add execute permissions (recommended)**
+
+```bash
+# Make scripts executable
+chmod +x build.sh compile.sh run_docker_app.sh curlCommandsPopulate.sh
+
+# Then run normally
+./build.sh
+```
+
+**Option 2: Run with sh directly**
+
+```bash
+sh build.sh
+sh compile.sh
+sh run_docker_app.sh
+sh curlCommandsPopulate.sh
+```
+
+**Why this happens:**
+- Execute permissions may not be preserved in ZIP/JAR archives
+- Cross-platform development (Windows → Mac/Linux)
+- Source distribution extraction
+
+**Note:** We've configured Git repositories to preserve execute permissions, but they may be lost in certain distribution formats.
+
+### Docker Build Failures
+
+**Problem:** Docker build fails for Gilhari examples
+
+**Common causes:**
+
+**1. Base image not found:**
+```bash
+# Pull the base image
+docker pull softwaretree/gilhari:latest
+```
+
+**2. Files not found during COPY:**
+```bash
+# Ensure compiled classes exist
+ls bin/
+
+# Recompile if needed
+./compile.sh  # or compile.cmd on Windows
+```
+
+**3. Port already in use:**
+```bash
+# Use different port
+docker run -p 8080:8081 gilhari_example1:1.0
+```
 
 ---
 
@@ -687,6 +1038,7 @@ ormcp-server
 ### Gilhari Debug Mode
 
 In your Dockerfile:
+
 ```dockerfile
 # Most verbose (0 = maximum detail)
 ENV DEBUG_LEVEL=0
@@ -699,12 +1051,14 @@ ENV DEBUG_LEVEL=5
 ```
 
 Rebuild and run:
+
 ```bash
 docker build -t my-gilhari:debug .
 docker run -p 80:8081 my-gilhari:debug
 ```
 
 View logs:
+
 ```bash
 docker logs -f <container-id>
 ```
@@ -723,26 +1077,27 @@ For MCP client debugging, see:
 
 Gather this information:
 
-1. **Version Information:**
-   ```bash
-   pip show ormcp-server
-   docker --version
-   python --version
-   ```
+**1. Version Information:**
 
-2. **Error Messages:**
-   - Complete error text
-   - Stack traces
-   - Log files
+```bash
+pip show ormcp-server
+docker --version
+python --version
+```
 
-3. **Configuration:**
-   - Environment variables (sanitize sensitive data)
-   - MCP client configuration
-   - Gilhari Dockerfile
+**2. Error Messages:**
+- Complete error text
+- Stack traces
+- Log files
 
-4. **Steps to Reproduce:**
-   - Exact commands run
-   - Expected vs actual behavior
+**3. Configuration:**
+- Environment variables (sanitize sensitive data)
+- MCP client configuration
+- Gilhari Dockerfile
+
+**4. Steps to Reproduce:**
+- Exact commands run
+- Expected vs actual behavior
 
 ### Support Channels
 
