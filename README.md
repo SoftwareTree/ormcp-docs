@@ -1185,8 +1185,13 @@ For common issues and solutions, see the [Complete Troubleshooting Guide](https:
 
 **Installation Issues:**
 - Command not found → Add Python Scripts to PATH
+- Externally managed environment → Use virtual environment (see [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error))
 - Empty executable → Reinstall package
 - Missing dependencies → `pip install --force-reinstall ormcp-server`
+
+**Gilhari Example Issues:**
+- Shell script permission denied → `chmod +x *.sh` or use `sh build.sh`
+- Database connection errors → Verify JDBC driver in Gilhari
 
 **Runtime Issues:**
 - Server won't start → Check Gilhari is running
