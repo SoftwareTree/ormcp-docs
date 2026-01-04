@@ -383,6 +383,8 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **ORMCP Server** depends on **Gilhari software**, a microservice framework for JSON data integration with databases. This setup must be completed before starting the ORMCP server.
 
+**IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** 
+
 ### Install Gilhari Software
 
 1. **Pull the Gilhari Docker image:**
