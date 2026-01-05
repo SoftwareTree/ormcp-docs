@@ -190,6 +190,8 @@ See detailed setup in [Gilhari Microservice Setup](#gilhari-microservice-setup) 
 
 To run the example:
 
+**IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** if not already installed on your machine
+
 ```bash
 # Clone the example repository of a sample Gilhari microservice that deals with User type of objects
 git clone https://github.com/SoftwareTree/gilhari_example1.git
@@ -383,7 +385,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **ORMCP Server** depends on **Gilhari software**, a microservice framework for JSON data integration with databases. This setup must be completed before starting the ORMCP server.
 
-**IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** 
+**IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** if not already installed on your machine
 
 ### Install Gilhari Software
 
