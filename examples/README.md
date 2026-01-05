@@ -19,6 +19,8 @@ All examples include:
 
 ### Quick Start
 
+**IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** if not already installed on your machine
+
 ```bash
 # 1. Clone an example repository
 git clone https://github.com/SoftwareTree/gilhari_example1.git
