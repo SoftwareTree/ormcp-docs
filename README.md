@@ -1273,6 +1273,7 @@ pytest
 * An object relational mapping (ORM) specification defines and controls the scope and shape of your object model corresponding to your relational model. 
 * The ORM specification is defined declaratively in a text file (.jdx) based on a simple grammar.
 * You may be able to reverse-engineer ORM specification from an existing database schema using tools/examples provided with Gilhari SDK. Check the `examples\JDX_ReverseEngineeringJSONExample` directory.
+* The reverse-engineering example is also available online at [github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample](https://github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample) 
 * For details on creating custom Gilhari microservices, refer to the Gilhari SDK documentation included in the source distribution package.
 * Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI_BASE_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls.
 
