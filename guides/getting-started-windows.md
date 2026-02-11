@@ -387,7 +387,7 @@ curl -i http://localhost:80/gilhari/v1/getObjectModelSummary/now
 Windows 10 and later include `tar` in PowerShell and Command Prompt:
 
 ```cmd
-tar -xzf ormcp_server-0.4.x.tar.gz
+tar -xzf ormcp_server-0.5.x.tar.gz
 ```
 
 For older Windows versions, use [7-Zip](https://www.7-zip.org/) or [WinRAR](https://www.rarlab.com/) to extract the file.
