@@ -14,22 +14,23 @@ ORMCP Server enables AI LLMs and MCP clients to easily exchange object-oriented 
 
 ## 📋 Table of Contents
 
-- [What is MCP?](#what-is-mcp)
-- [Features](#-features)
-- [How It Works](#how-it-works)
-- [Quick Start](#-quick-start)
-- [Installation](#ormcp-package-installation)
-- [Gilhari Microservice Setup](#gilhari-microservice-setup)
-- [Configuration](#configuration-for-ormcp-server)
-- [Starting the Server](#starting-the-server)
-- [Client Configuration](#mcp-client-configuration)
-- [Usage Examples](#usage-examples)
-- [MCP Tools Reference](#mcp-tools-reference)
-- [Troubleshooting](#troubleshooting)
-- [Development](#development)
-- [Contributing](#contributing)
-- [License](#license)
-- [Support & Resources](#support--resources)
+* [What is MCP?](#what-is-mcp)
+* [Features](#-features)
+* [How It Works](#how-it-works)
+* [Quick Start](#-quick-start)
+* Platform-Specific Guides — 🍎 [macOS](./guides/getting-started-mac.md) · 🪟 [Windows](./guides/getting-started-windows.md) · 🐧 [Linux](./guides/getting-started-linux.md)
+* [Installation](#ormcp-package-installation)
+* [Gilhari Microservice Setup](#gilhari-microservice-setup)
+* [Configuration](#configuration-for-ormcp-server)
+* [Starting the Server](#starting-the-server)
+* [Client Configuration](#mcp-client-configuration)
+* [Usage Examples](#usage-examples)
+* [MCP Tools Reference](#mcp-tools-reference)
+* [Troubleshooting](#troubleshooting)
+* [Development](#development)
+* [Contributing](#contributing)
+* [License](#license)
+* [Support & Resources](#support--resources)
 
 ## What is MCP?
 
@@ -39,21 +40,21 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
 
 ## ✨ Features
 
-- **✅ Standardized Interface:** Fully compliant with the Model Context Protocol (MCP) specification
-- **🌐 Database Agnostic:** Works with any JDBC-compliant database (e.g., PostgreSQL, MySQL, Oracle, SQL Server, DB2, SQLite)
-- **↔️ Bi-directional Data Flow:** Seamless AI ↔ Database communication with optional support for only READONLY operations
-- **🔄 Object-Relational Mapping (ORM):** JSON object operations (CRUD) transparently mapped to relational data 
-- **🔒 Secure Data Access**: Domain model-specific operations promote data protection
-- **🧾 Declarative ORM Specification:** Intuitive, non-intrusive, and flexible ORM specification based on a simple grammar
-- **🕸️ Support for Complex Object Modeling:** Including one-to-one, one-to-many, and many-to-many relationships, and path-expressions
-- **🖇️ Flexible Queries:** Deep and Shallow queries, Various operational directives similar to **GraphQL** capabilities to refine the shape and scope of returned objects
-- **🚀 Highly Optimized and Lightweight Mapping Engine:** Connection pooling, Prepared statements, Optimized SQL statements, Minimal database trips, Caching of metadata
-- **🔌 Compatible with Existing Data and Databases:** Works with existing schemas and data in any database; Does not require any native JSON data type 
-- **📚 Comprehensive Documentation:** Detailed User manual and README files, API documentation, sample apps
-- **☁️ Cloud Agnostic:** Deploy anywhere with Docker support
-- **⚡ High Performance:** Built on versatile Gilhari microservice architecture and optimised ORM engine
-- **🛡️ Robust Error Handling:** Clear error messages and recovery mechanisms
-- **📈 Scalable:** Handles multiple concurrent requests efficiently; Scalable Docker deployment
+* **✅ Standardized Interface:** Fully compliant with the Model Context Protocol (MCP) specification
+* **🌐 Database Agnostic:** Works with any JDBC-compliant database (e.g., PostgreSQL, MySQL, Oracle, SQL Server, DB2, SQLite)
+* **↔️ Bi-directional Data Flow:** Seamless AI ↔ Database communication with optional support for only READONLY operations
+* **🔄 Object-Relational Mapping (ORM):** JSON object operations (CRUD) transparently mapped to relational data
+* **🔒 Secure Data Access**: Domain model-specific operations promote data protection
+* **🧾 Declarative ORM Specification:** Intuitive, non-intrusive, and flexible ORM specification based on a simple grammar
+* **🕸️ Support for Complex Object Modeling:** Including one-to-one, one-to-many, and many-to-many relationships, and path-expressions
+* **🖇️ Flexible Queries:** Deep and Shallow queries, Various operational directives similar to **GraphQL** capabilities to refine the shape and scope of returned objects
+* **🚀 Highly Optimized and Lightweight Mapping Engine:** Connection pooling, Prepared statements, Optimized SQL statements, Minimal database trips, Caching of metadata
+* **🔌 Compatible with Existing Data and Databases:** Works with existing schemas and data in any database; Does not require any native JSON data type
+* **📚 Comprehensive Documentation:** Detailed User manual and README files, API documentation, sample apps
+* **☁️ Cloud Agnostic:** Deploy anywhere with Docker support
+* **⚡ High Performance:** Built on versatile Gilhari microservice architecture and optimised ORM engine
+* **🛡️ Robust Error Handling:** Clear error messages and recovery mechanisms
+* **📈 Scalable:** Handles multiple concurrent requests efficiently; Scalable Docker deployment
 
 ## How It Works
 
@@ -71,46 +72,60 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
          |     JSON result (MCP format)   |                                 |
          |<-------------------------------|                                 |
 ```
+
 **Important:** The AI application (LLM client) translates natural language into MCP tool calls. ORMCP Server then translates these MCP tool calls into REST API calls to Gilhari.
 
 **ORMCP Server** bridges the gap between modern AI applications and relational databases through:
-- **MCP Protocol**: Standardized AI-to-tool communication
-- **Gilhari**: Integration layer with relational databases via ORM and JDBC
-- **JSON Mapping**: Transparent object-relational mapping
+
+* **MCP Protocol**: Standardized AI-to-tool communication
+* **Gilhari**: Integration layer with relational databases via ORM and JDBC
+* **JSON Mapping**: Transparent object-relational mapping
 
 ## 🚀 Quick Start
+
+> **New to ORMCP? Jump straight to your platform-specific guide for a streamlined setup:**
+> 🍎 [macOS](./guides/getting-started-mac.md) · 🪟 [Windows](./guides/getting-started-windows.md) · 🐧 [Linux](./guides/getting-started-linux.md)
+>
+> The sections below cover all platforms together as a complete reference.
 
 ### Three Simple Steps to Use ORMCP
 
 **1. Scope Your Data**
-- Define lightweight object models for your relevant data
-- Write a declarative ORM specification for those models in a text file using a simple (JDX) grammar
+
+* Define lightweight object models for your relevant data
+* Write a declarative ORM specification for those models in a text file using a simple (JDX) grammar
 
 **2. Build Your Gilhari Microservice**
-- Add models, ORM specification, and JDBC driver to a Dockerfile
-- Build the Gilhari Docker image
+
+* Add models, ORM specification, and JDBC driver to a Dockerfile
+* Build the Gilhari Docker image
 
 **3. Run with ORMCP**
-- Connect ORMCP to the Gilhari microservice
-- Start Gilhari, then ORMCP
-- Interact with scoped relational data in an intuitive, object-oriented way using an AI Agent or MCP client
+
+* Connect ORMCP to the Gilhari microservice
+* Start Gilhari, then ORMCP
+* Interact with scoped relational data in an intuitive, object-oriented way using an AI Agent or MCP client
 
 ---
 
 ### Detailed Quick Start
 
 #### Prerequisites
-- Python 3.12+
-- Docker (for Gilhari microservice)
-- JDBC driver for your target database
+
+* Python 3.12+
+* Docker (for Gilhari microservice)
+* JDBC driver for your target database
 
 #### 1. Install ORMCP Server
+
+> **Platform-specific guides** with step-by-step install instructions for your OS:
+> [macOS](./guides/getting-started-mac.md) · [Windows](./guides/getting-started-windows.md) · [Linux](./guides/getting-started-linux.md)
 
 **For Beta Users (Gemfury Private PyPI):**
 
 Request beta access and receive your token at: [softwaretree.com/products/ormcp](https://www.softwaretree.com)
 
-```bash
+```
 # Install with token
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
@@ -124,11 +139,18 @@ pip show ormcp-server
 
 Replace `YOUR_TOKEN` with your beta access token.
 
-> **📌 Linux/Mac Users:** Modern Linux distributions require virtual environments. See [troubleshooting](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error) if you get "externally-managed-environment" errors.
-```bash
-# Create virtual environment (required on modern Linux)
+> **📌 Linux/Mac Users:** Modern Linux distributions and macOS may require virtual environments. See your [platform guide](#-quick-start) or the [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error) if you get "externally-managed-environment" errors.
+
+```
+# Create virtual environment (recommended on Linux/Mac)
 python3 -m venv .venv
+
+# Activate — Linux/Mac:
 source .venv/bin/activate
+# Activate — Windows (Command Prompt):
+.venv\Scripts\activate
+# Activate — Windows (PowerShell):
+.venv\Scripts\Activate.ps1
 
 # Install with token
 pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
@@ -138,7 +160,7 @@ pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
 
 **For Production Users (PyPI):**
 
-```bash
+```
 # Install from PyPI (available after beta)
 pip install ormcp-server
 
@@ -146,53 +168,22 @@ pip install ormcp-server
 pip show ormcp-server
 ```
 
-**Windows Users - Add Python Scripts to PATH:**
+**If `ormcp-server` command is not found after installation:**
 
-If you encounter `'ormcp-server' is not recognized` errors, add Python's Scripts directory to your PATH:
-
-```powershell
-# Option 1: Quick command (run in PowerShell, then restart terminal)
-setx PATH "%PATH%;%APPDATA%\Python\Python313\Scripts"
-
-# Option 2: Use full path directly
-%APPDATA%\Python\Python313\Scripts\ormcp-server.exe
-```
-
-**To find your Scripts directory:**
-
-```bash
-# Windows
-pip show -f ormcp-server | findstr "Location"
-# The Scripts folder is in: Location\..\..\Scripts\
-
-# Linux/Mac
-pip show -f ormcp-server | grep Location
-# The bin folder is in: ~/.local/bin/
-```
-
-**Linux/Mac Users:**
-
-If `ormcp-server` command is not found:
-
-```bash
-# Add to PATH in ~/.bashrc or ~/.zshrc
-export PATH="$HOME/.local/bin:$PATH"
-
-# Then reload your shell
-source ~/.bashrc  # or source ~/.zshrc
-```
+Add the Python executable directory to your PATH. See your platform guide for details:
+[macOS](./guides/getting-started-mac.md#troubleshooting) · [Windows](./guides/getting-started-windows.md#troubleshooting) · [Linux](./guides/getting-started-linux.md#troubleshooting)
 
 #### 2. Set Up Gilhari Microservice
 
 See detailed setup in [Gilhari Microservice Setup](#gilhari-microservice-setup) section below.
 
-**Note:** A complete working example is available in a separate repository: **[gilhari_example1](https://github.com/SoftwareTree/gilhari_example1)**
+**Note:** A complete working example is available in a separate repository: **[gilhari\_example1](https://github.com/SoftwareTree/gilhari_example1)**
 
 To run the example:
 
 **IMPORTANT:** Docker is required for building and running a Gilhari microservice — **[Get Docker](https://docs.docker.com/get-docker/)** if not already installed on your machine
 
-```bash
+```
 # Clone the example repository of a sample Gilhari microservice that deals with User type of objects
 git clone https://github.com/SoftwareTree/gilhari_example1.git
 cd gilhari_example1
@@ -216,7 +207,7 @@ docker run -p 80:8081 gilhari_example1:1.0
 
 #### 3. Configure Environment
 
-```bash
+```
 # Linux/Mac
 export GILHARI_BASE_URL="http://localhost:80/gilhari/v1/"
 export MCP_SERVER_NAME="MyORMCPServer"
@@ -232,20 +223,15 @@ $env:MCP_SERVER_NAME="MyORMCPServer"
 
 #### 4. Start the ORMCP Server
 
-```bash
+```
 ormcp-server
 ```
 
-**If you get command not found errors, see Step 1 above for PATH configuration, or use:**
+**If you get command not found errors, see your platform guide:**
+[macOS](./guides/getting-started-mac.md#troubleshooting) · [Windows](./guides/getting-started-windows.md#troubleshooting) · [Linux](./guides/getting-started-linux.md#troubleshooting)
 
-```bash
-# Windows - full path
-%APPDATA%\Python\Python313\Scripts\ormcp-server.exe
-
-# Linux/Mac - full path
-~/.local/bin/ormcp-server
-
-# Or use Python directly
+```
+# Or use Python directly (works on all platforms)
 python -m ormcp_server
 ```
 
@@ -255,7 +241,7 @@ For **Claude Desktop**, add to `claude_desktop_config.json`:
 
 **Option 1: Using command name (requires PATH configured):**
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server": {
@@ -272,7 +258,7 @@ For **Claude Desktop**, add to `claude_desktop_config.json`:
 
 **Option 2: Using full path (recommended for Windows):**
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server": {
@@ -289,7 +275,7 @@ For **Claude Desktop**, add to `claude_desktop_config.json`:
 
 **To find your exact path:**
 
-```bash
+```
 # Windows (PowerShell)
 (Get-Command ormcp-server).Source
 
@@ -312,7 +298,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **Generated MCP Call:**
 
-```json
+```
 {
   "name": "query",
   "arguments": {
@@ -326,7 +312,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **Result:**
 
-```json
+```
 [
   {"id": 55, "name": "Mary55", "city": "Campbell", "state": "CA"},
   {"id": 56, "name": "Mike56", "city": "Boston", "state": "MA"}
@@ -339,7 +325,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **Generated MCP Call:**
 
-```json
+```
 {
   "name": "insert",
   "arguments": {
@@ -363,7 +349,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **Generated MCP Call:**
 
-```json
+```
 {
   "name": "getAggregate",
   "arguments": {
@@ -377,7 +363,7 @@ You're ready! Your AI client can now interact with your database using natural l
 
 **Result:**
 
-```json
+```
 49
 ```
 
@@ -390,31 +376,34 @@ You're ready! Your AI client can now interact with your database using natural l
 ### Install Gilhari Software
 
 1. **Pull the Gilhari Docker image:**
-   ```bash
+
+   ```
    docker pull softwaretree/gilhari:latest
    ```
-
 2. **Install the Gilhari SDK:**
-   - The **SDK** for **Gilhari software** is bundled in the **ORMCP Server** package under the **Gilhari_SDK** folder
-   - Alternatively, download from: https://www.softwaretree.com/v1/products/gilhari/download-gilhari.php
-   - The **SDK** includes documentation (READMEs, API guides, sample applications) to help you use **Gilhari software** easily
+
+   * The **SDK** for **Gilhari software** is bundled in the **ORMCP Server** package under the **Gilhari\_SDK** folder
+   * Alternatively, download from: <https://www.softwaretree.com/v1/products/gilhari/download-gilhari.php>
+   * The **SDK** includes documentation (READMEs, API guides, sample applications) to help you use **Gilhari software** easily
 
 ### Configure Your App-Specific Gilhari Microservice
 
 Follow these steps (detailed in Gilhari SDK documentation):
+
 1. **Define domain model classes** - Java container classes for your JSON objects
-2. **Create declarative ORM specification** - Map JSON attributes to database schema  
+2. **Create declarative ORM specification** - Map JSON attributes to database schema
 3. **Build Docker image of the app-specific Gilhari microservice** - Include domain classes, ORM specification, and JDBC driver
 4. **Run the microservice:**
-   ```bash
+
+   ```
    docker run -p 80:8081 your-gilhari-service:1.0
    ```
 
-**Note:** A complete working example is available in a separate repository: **[gilhari_example1](https://github.com/SoftwareTree/gilhari_example1)**. This example demonstrates a Gilhari microservice that manages **User** objects.
+**Note:** A complete working example is available in a separate repository: **[gilhari\_example1](https://github.com/SoftwareTree/gilhari_example1)**. This example demonstrates a Gilhari microservice that manages **User** objects.
 
 ### Quick Start with Example:
 
-```bash
+```
 # Clone the example repository
 git clone https://github.com/SoftwareTree/gilhari_example1.git
 cd gilhari_example1
@@ -433,13 +422,13 @@ docker run -p 80:8081 gilhari_example1:1.0
 ./curlCommandsPopulate.sh   # On Linux/Mac
 ```
 
-For detailed setup and configuration instructions, see the [gilhari_example1 README](https://github.com/SoftwareTree/gilhari_example1/blob/main/README.md).
+For detailed setup and configuration instructions, see the [gilhari\_example1 README](https://github.com/SoftwareTree/gilhari_example1/blob/main/README.md).
 
 ## ORMCP Package Installation
 
 ### Recommended: Virtual Environment
 
-```bash
+```
 # Create and activate virtual environment
 python -m venv .venv
 
@@ -469,7 +458,7 @@ Replace `YOUR_TOKEN` with your beta access token from [softwaretree.com/products
 
 **Beta (Gemfury):**
 
-```bash
+```
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
 pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
@@ -481,11 +470,11 @@ Replace `YOUR_TOKEN` with your beta access token.
 
 **Production (PyPI) - available after beta:**
 
-```bash
+```
 pip install ormcp-server
 ```
 
-**Note:** When installing globally (without a virtual environment), the `ormcp-server` executable will be installed to your user's Python Scripts directory. See the PATH configuration instructions in [Quick Start](#-quick-start) if you encounter "command not found" errors.
+**Note:** When installing globally (without a virtual environment), the `ormcp-server` executable will be installed to your user's Python Scripts directory. See your [platform guide](#-quick-start) if you encounter "command not found" errors.
 
 ### Accessing Full Package with SDK and Examples
 
@@ -493,7 +482,7 @@ To access the complete package including Gilhari SDK, examples, and documentatio
 
 **Beta (Gemfury):**
 
-```bash
+```
 # Download source distribution
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
@@ -517,7 +506,7 @@ Replace `YOUR_TOKEN` with your beta access token.
 
 **Production (PyPI) - available after beta:**
 
-```bash
+```
 # Download source distribution
 pip download --no-binary :all: ormcp-server
 
@@ -527,9 +516,10 @@ cd ormcp_server-*/
 ```
 
 **Windows users:** If you don't have `tar` installed, you can:
-- Use 7-Zip or WinRAR to extract the .tar.gz file
-- Or use PowerShell: `tar -xzf ormcp_server-*.tar.gz`
-- Or download directly from the Gemfury/PyPI website
+
+* Use 7-Zip or WinRAR to extract the .tar.gz file
+* Or use PowerShell: `tar -xzf ormcp_server-*.tar.gz`
+* Or download directly from the Gemfury/PyPI website
 
 ## Package Contents
 
@@ -539,7 +529,7 @@ The ORMCP Server package includes additional resources beyond the Python code:
 
 When you install via pip, you get the core Python package needed to run ORMCP Server:
 
-```bash
+```
 pip install ormcp-server
 ```
 
@@ -548,13 +538,14 @@ This installs only the essential runtime files to your Python environment.
 ### Full Package with SDK and Documentation (Source Distribution)
 
 The complete package includes:
-- **Gilhari_SDK/** - Complete SDK with documentation, examples, and tools for creating custom Gilhari microservices
-- **gilhari_example1/** - Ready-to-use example Gilhari microservice
-- **package/client/** - Example client code and usage documentation
-- **package/docs/** - Additional technical documentation
-- **pyproject.toml** - Build configuration
-- **README.md** - This file
-- **LICENSE** - License terms
+
+* **Gilhari\_SDK/** - Complete SDK with documentation, examples, and tools for creating custom Gilhari microservices
+* **gilhari\_example1/** - Ready-to-use example Gilhari microservice
+* **package/client/** - Example client code and usage documentation
+* **package/docs/** - Additional technical documentation
+* **pyproject.toml** - Build configuration
+* **README.md** - This file
+* **LICENSE** - License terms
 
 ### Accessing the Full Package
 
@@ -562,7 +553,7 @@ The complete package includes:
 
 **Beta (Gemfury):**
 
-```bash
+```
 # Download the source distribution (.tar.gz)
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
@@ -571,9 +562,9 @@ pip download --no-binary :all: \
   --extra-index-url https://pypi.org/simple \
   ormcp-server
 
-# Extract it (use the appropriate version number; e.g., 0.4.x)
-tar -xzf ormcp_server-0.4.x.tar.gz
-cd ormcp_server-0.4.x
+# Extract it (use the appropriate version number; e.g., 0.5.x)
+tar -xzf ormcp_server-0.5.x.tar.gz
+cd ormcp_server-0.5.x
 
 # Now you have access to:
 # - Gilhari_SDK/
@@ -586,7 +577,7 @@ Replace `YOUR_TOKEN` with your beta access token.
 
 **Production (PyPI) - available after beta:**
 
-```bash
+```
 # Download the source distribution
 pip download --no-binary :all: ormcp-server
 
@@ -596,15 +587,16 @@ cd ormcp_server-*/
 ```
 
 **Windows users:** If you don't have `tar` installed, you can:
-- Use 7-Zip or WinRAR to extract the .tar.gz file
-- Or use PowerShell: `tar -xzf ormcp_server-0.4.x.tar.gz`
-- Or download directly from the Gemfury/PyPI website
+
+* Use 7-Zip or WinRAR to extract the .tar.gz file
+* Or use PowerShell: `tar -xzf ormcp_server-0.5.x.tar.gz`
+* Or download directly from the Gemfury/PyPI website
 
 **Option 2: Download from Package Page**
 
-**Beta:** Contact ormcp_support@softwaretree.com for direct download links.
+**Beta:** Contact [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) for direct download links.
 
-**Production (after beta):** Visit https://pypi.org/project/ormcp-server/ and download the `.tar.gz` file.
+**Production (after beta):** Visit <https://pypi.org/project/ormcp-server/> and download the `.tar.gz` file.
 
 Look for the "Download files" section and download the source distribution (`.tar.gz`).
 
@@ -612,7 +604,7 @@ Look for the "Download files" section and download the source distribution (`.ta
 
 After extracting the source distribution:
 
-```bash
+```
 # Navigate to the SDK
 cd Gilhari_SDK
 
@@ -631,7 +623,7 @@ cd Gilhari_SDK
 
 ### Running the Example Gilhari Microservice
 
-```bash
+```
 # Navigate to the example
 cd gilhari_example1
 
@@ -644,39 +636,41 @@ cd gilhari_example1
 
 **Why Two Package Formats?**
 
-- **Wheel (.whl)** - Binary distribution, fast to install, includes only runtime code (~50KB)
-- **Source Distribution (.tar.gz)** - Complete package with all resources (~several MB)
+* **Wheel (.whl)** - Binary distribution, fast to install, includes only runtime code (~50KB)
+* **Source Distribution (.tar.gz)** - Complete package with all resources (~several MB)
 
 Most users only need the wheel for running ORMCP Server. Download the source distribution if you need:
-- The Gilhari SDK for creating custom microservices
-- Example applications and client code
-- Complete documentation
-- Additional technical guides
+
+* The Gilhari SDK for creating custom microservices
+* Example applications and client code
+* Complete documentation
+* Additional technical guides
 
 ## Configuration for ORMCP Server
 
 Configure via environment variables:
 
 | Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
+| --- | --- | --- | --- |
 | `GILHARI_BASE_URL` | Gilhari microservice URL | `http://localhost:80/gilhari/v1/` | `http://myhost:8888/gilhari/v1/` |
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` | `MyCompanyORMCP` |
 | `GILHARI_TIMEOUT` | API timeout (seconds) | `30` | `60` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` | `DEBUG`, `WARNING`, `ERROR` |
 | `READONLY_MODE` | Expose only read operations | `False` | `True` |
-| `GILHARI_NAME`  | Name of the app-specific Gilhari microservice | "" | `my-gilhari-microservice` |
+| `GILHARI_NAME` | Name of the app-specific Gilhari microservice | "" | `my-gilhari-microservice` |
 | `GILHARI_IMAGE` | Docker image name of the app-specific Gilhari microservice | "" | `gilhari_example1:1.0` |
-| `GILHARI_HOST`  | IP address of the host machine for Gilhari microservice    | `localhost` | `10.20.30.40` |
-| `GILHARI_PORT`  | Port number to contact the Gilhari microservice   | `80` | `8888` |
+| `GILHARI_HOST` | IP address of the host machine for Gilhari microservice | `localhost` | `10.20.30.40` |
+| `GILHARI_PORT` | Port number to contact the Gilhari microservice | `80` | `8888` |
 
 **Notes:**
-- If `READONLY_MODE` is set to `True`, the MCP tools that can potentially modify the data (e.g., insert, update, update2, delete, delete2) are not exposed by the **ORMCP server** to the MCP client. By default, all MCP tools are exposed.
-- `GILHARI_BASE_URL` and `GILHARI_NAME` are used to probe an already running Gilhari microservice container
-- `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` are used to run a new instance of Gilhari microservice if an existing microservice is not found. Please make sure that the values of `GILHARI_HOST` and `GILHARI_PORT` variables match the corresponding values in `GILHARI_BASE_URL` setting because that is where the **ORMCP server** will contact the Gilhari microservice.
+
+* If `READONLY_MODE` is set to `True`, the MCP tools that can potentially modify the data (e.g., insert, update, update2, delete, delete2) are not exposed by the **ORMCP server** to the MCP client. By default, all MCP tools are exposed.
+* `GILHARI_BASE_URL` and `GILHARI_NAME` are used to probe an already running Gilhari microservice container
+* `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` are used to run a new instance of Gilhari microservice if an existing microservice is not found. Please make sure that the values of `GILHARI_HOST` and `GILHARI_PORT` variables match the corresponding values in `GILHARI_BASE_URL` setting because that is where the **ORMCP server** will contact the Gilhari microservice.
 
 ### Configuration Example
 
-```bash
+```
 # Linux/Mac
 export GILHARI_BASE_URL="http://localhost:80/gilhari/v1/"
 export GILHARI_TIMEOUT="30"
@@ -702,7 +696,7 @@ $env:LOG_LEVEL="INFO"
 
 Activate your virtual environment (if using one):
 
-```bash
+```
 # Linux/Mac
 source .venv/bin/activate
 
@@ -715,41 +709,19 @@ source .venv/bin/activate
 
 Start the server using the CLI command:
 
-```bash
+```
 ormcp-server
 ```
 
 This runs the MCP server in stdio mode via the `main.py` entry point.
 
-**Troubleshooting - Command Not Found:**
+**Troubleshooting — Command Not Found:**
 
-If you get `'ormcp-server' is not recognized` or `command not found` error:
+If you get `'ormcp-server' is not recognized` or `command not found`, see your platform guide for PATH configuration and fix options:
+[macOS](./guides/getting-started-mac.md#troubleshooting) · [Windows](./guides/getting-started-windows.md#troubleshooting) · [Linux](./guides/getting-started-linux.md#troubleshooting)
 
-**Windows:**
-
-```powershell
-# Option 1: Use full path
-%APPDATA%\Python\Python313\Scripts\ormcp-server.exe
-
-# Option 2: Add Scripts to PATH (see Quick Start section)
-setx PATH "%PATH%;%APPDATA%\Python\Python313\Scripts"
-# Then restart your terminal
-
-# Option 3: Use Python module directly
-python -m ormcp_server
 ```
-
-**Linux/Mac:**
-
-```bash
-# Option 1: Use full path
-~/.local/bin/ormcp-server
-
-# Option 2: Add to PATH in ~/.bashrc or ~/.zshrc
-export PATH="$HOME/.local/bin:$PATH"
-source ~/.bashrc  # or source ~/.zshrc
-
-# Option 3: Use Python module directly
+# Use Python directly on any platform (always works)
 python -m ormcp_server
 ```
 
@@ -757,7 +729,7 @@ python -m ormcp_server
 
 **Note:** Requires source distribution. Download with:
 
-```bash
+```
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
 pip download --no-binary :all: \
@@ -770,7 +742,7 @@ cd ormcp_server-*/
 
 Run the server directly with Python:
 
-```bash
+```
 python src/ormcp_server.py
 ```
 
@@ -780,7 +752,7 @@ This bypasses the CLI wrapper and runs the server directly.
 
 **Direct executable execution:**
 
-```bash
+```
 # Windows
 .venv\Scripts\ormcp-server.exe
 
@@ -790,13 +762,13 @@ This bypasses the CLI wrapper and runs the server directly.
 
 **Using fastmcp CLI (requires source distribution):**
 
-```bash
+```
 fastmcp run src/ormcp_server.py
 ```
 
 **Using MCP Inspector dev mode (requires source distribution):**
 
-```bash
+```
 mcp dev src/ormcp_server.py
 ```
 
@@ -804,7 +776,7 @@ mcp dev src/ormcp_server.py
 
 If you have the `ormcp-server` package installed, you can use MCP Inspector to explore the server's capabilities:
 
-```bash
+```
 # Using the installed package
 npx @modelcontextprotocol/inspector python -m ormcp_server
 
@@ -820,7 +792,7 @@ This allows you to interactively test and explore ORMCP Server tools without nee
 
 You can start the ORMCP server in HTTP mode from the command line:
 
-```bash
+```
 # Basic HTTP mode
 python src/ormcp_server.py --transport http
 
@@ -830,7 +802,7 @@ ormcp-server --mode http
 
 **Customize host and port:**
 
-```bash
+```
 python src/ormcp_server.py --transport http --host 0.0.0.0 --port 9000
 
 # Or using CLI
@@ -838,13 +810,14 @@ ormcp-server --mode http --host 0.0.0.0 --port 9000
 ```
 
 **Available command-line options:**
-- `--mode` / `--transport`: Choose between "stdio" (default) or "http"
-- `--host`: Set the host address (default: 127.0.0.1, only used in HTTP mode)
-- `--port`: Set the port number (default: 8080, only used in HTTP mode)
+
+* `--mode` / `--transport`: Choose between "stdio" (default) or "http"
+* `--host`: Set the host address (default: 127.0.0.1, only used in HTTP mode)
+* `--port`: Set the port number (default: 8080, only used in HTTP mode)
 
 **Quick HTTP setup:**
 
-```bash
+```
 python src/ormcp_server.py --transport http
 # or
 ormcp-server --mode http
@@ -867,16 +840,19 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 ```
 [INFO] ORMCP server name: ORMCPServerDemo
 [INFO] GILHARI BASE URL: http://localhost:80/gilhari/v1/
-[INFO] ORMCP server v0.4.x starting in stdio (or http) mode ...
+[INFO] ORMCP server v0.5.x starting in stdio (or http) mode ...
 ```
 
 ## MCP Client Configuration
 
 ### Claude Desktop
 
+> **Platform-specific config file locations and path setup:**
+> [macOS](./guides/getting-started-mac.md#step-5-connect-your-ai-client) · [Windows](./guides/getting-started-windows.md#step-5-connect-your-ai-client) · [Linux](./guides/getting-started-linux.md#step-5-connect-your-ai-client)
+
 #### Option 1: Using Command Name (Requires PATH Configured)
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server": {
@@ -893,7 +869,7 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 
 #### Option 2: Using Full Path (Recommended for Windows)
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server": {
@@ -910,7 +886,7 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 
 **To find your exact installation path:**
 
-```bash
+```
 # Windows (PowerShell)
 (Get-Command ormcp-server).Source
 
@@ -927,7 +903,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 
 #### Option 3: Direct Python Execution
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server": {
@@ -947,7 +923,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 
 #### Option 4: Using FastMCP (For Developers with Source Distribution)
 
-```json
+```
 {
   "mcpServers": {
     "ORMCPServerDemo": {
@@ -971,7 +947,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 
 #### Option 5: HTTP Mode (Experimental)
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server-http": {
@@ -982,7 +958,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
       ],
       "env": {
         "GILHARI_BASE_URL": "http://localhost:80/gilhari/v1/",
-        "MCP_SERVER_NAME": "MyORMCPServerHTTP"
+        "MCP_SERVER_NAME": "MyORMCPServer"
       }
     }
   }
@@ -990,16 +966,17 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 ```
 
 **Notes:**
-- `ORMCPServerDemo` is the default name of the ORMCP server.
-- Replace `<YourUsername>` with your actual Windows username
-- If you are providing a port number of the associated Gilhari microservice through the "GILHARI_BASE_URL" environment variable, make sure that is the port where that Gilhari microservice is listening.
-- *Note: As of July 20, 2025, Claude desktop did not support connecting to an MCP server running in http mode.*
+
+* `ORMCPServerDemo` is the default name of the ORMCP server.
+* Replace `<YourUsername>` with your actual Windows username
+* If you are providing a port number of the associated Gilhari microservice through the "GILHARI\_BASE\_URL" environment variable, make sure that is the port where that Gilhari microservice is listening.
+* *Note: As of July 20, 2025, Claude desktop did not support connecting to an MCP server running in http mode.*
 
 ### Gemini CLI
 
 Update the Gemini `settings.json` file:
 
-```json
+```
 {
   "mcpServers": {
     "my-ormcp-server-http": {
@@ -1016,58 +993,64 @@ Update the Gemini `settings.json` file:
 To connect the ORMCP server to a custom GPT in developer mode, the server must be running in HTTP mode and be accessible from a public URL.
 
 1. **Prepare the Backend:**
+
    * First, ensure the **Gilhari microservice** is compiled and running in its Docker container as per the setup instructions.
    * Use `curl` to verify the Gilhari service is responsive:
-     ```bash
+
+     ```
      curl -i http://localhost:80/gilhari/v1/getObjectModelSummary/now
      ```
-
 2. **Configure and Run the ORMCP Server:**
+
    * Set the required environment variables for the ORMCP server to connect to Gilhari.
-     ```bash
+
+     ```
      export GILHARI_BASE_URL="http://localhost:80/gilhari/v1/"
      export MCP_SERVER_NAME="MyORMCPServer"
      export GILHARI_TIMEOUT="30"
      export LOG_LEVEL="INFO"
      ```
    * Start the ORMCP server in **HTTP mode**, as this is required for web-based clients.
-     ```bash
+
+     ```
      # Run from the project's root directory
      ormcp-server --mode http --port 8080
      ```
-
 3. **Expose the Server with a Public URL:**
    OpenAI's servers need a public web address to reach your local ORMCP server. Use a tunneling service like `cloudflared` or `ngrok` to create a secure public URL that forwards to your local machine.
-   
+
    * **Option A: Using `cloudflared` (Recommended)**
-     * In a new terminal, start a Cloudflare tunnel pointing to your server's port.
-       ```bash
+
+     + In a new terminal, start a Cloudflare tunnel pointing to your server's port.
+
+       ```
        cloudflared tunnel --url http://localhost:8080
        ```
-     * `cloudflared` will provide a persistent public URL (e.g., `https://<your-tunnel-name>.trycloudflare.com`).
-   
+     + `cloudflared` will provide a persistent public URL (e.g., `https://<your-tunnel-name>.trycloudflare.com`).
    * **Option B: Using `ngrok`**
-     * In a new terminal, start `ngrok` to forward traffic to port 8080.
-       ```bash
+
+     + In a new terminal, start `ngrok` to forward traffic to port 8080.
+
+       ```
        ngrok http 8080
        ```
-     * `ngrok` will provide a temporary public HTTPS URL (e.g., `https://random-string.ngrok-free.app`). Note that this URL changes every time you restart `ngrok` on the free plan.
-
+     + `ngrok` will provide a temporary public HTTPS URL (e.g., `https://random-string.ngrok-free.app`). Note that this URL changes every time you restart `ngrok` on the free plan.
 4. **Connect to Your Custom GPT:**
+
    * Take the public URL generated by `cloudflared` or `ngrok`.
    * Append `/mcp` to the end of this URL. The final result will be your MCP endpoint, for example: `https://<your-public-url>/mcp`.
    * In your GPT's configuration settings (**Settings** → **Apps & Connectors** → **Create**), paste this complete URL into the MCP Server URL field. GPT will then discover and connect to the tools provided by your ORMCP server.
 
 ### Other MCP Clients
 
-- Connect to ORMCP server and use the MCP compatible ORM tools provided by the ORMCP server.
-- Configure according to your client's MCP server setup requirements using the appropriate transport mode (STDIO or HTTP).
-- **📚 Integration Guides:** See detailed documentation on connecting to ORMCP Server:
-  - [MCP Protocol Reference](https://github.com/softwaretree/ormcp-docs/blob/main/docs/mcp_protocol_reference.md) - Low-level JSON-RPC protocol details
-  - [Using the ORMCP Client Example](https://github.com/softwaretree/ormcp-docs/blob/main/client/using_ormcp_client_example.md) - Python client usage guide
-  - [Interacting with ORMCP Server in STDIO Mode](https://github.com/softwaretree/ormcp-docs/blob/main/docs/Interacting_With_ORMCP_Server_In_STDIO_Mode.md) - STDIO transport guide
-  - [Interacting with ORMCP Server in HTTP Mode](https://github.com/softwaretree/ormcp-docs/blob/main/docs/Interacting_With_ORMCP_Server_In_HTTP_Mode.md) - HTTP transport guide
-  - Additional guides available in the [documentation repository](https://github.com/softwaretree/ormcp-docs) (also included in the source distribution)
+* Connect to ORMCP server and use the MCP compatible ORM tools provided by the ORMCP server.
+* Configure according to your client's MCP server setup requirements using the appropriate transport mode (STDIO or HTTP).
+* **📚 Integration Guides:** See detailed documentation on connecting to ORMCP Server:
+  + [MCP Protocol Reference](https://github.com/softwaretree/ormcp-docs/blob/main/docs/mcp_protocol_reference.md) - Low-level JSON-RPC protocol details
+  + [Using the ORMCP Client Example](https://github.com/softwaretree/ormcp-docs/blob/main/client/using_ormcp_client_example.md) - Python client usage guide
+  + [Interacting with ORMCP Server in STDIO Mode](https://github.com/softwaretree/ormcp-docs/blob/main/docs/Interacting_With_ORMCP_Server_In_STDIO_Mode.md) - STDIO transport guide
+  + [Interacting with ORMCP Server in HTTP Mode](https://github.com/softwaretree/ormcp-docs/blob/main/docs/Interacting_With_ORMCP_Server_In_HTTP_Mode.md) - HTTP transport guide
+  + Additional guides available in the [documentation repository](https://github.com/softwaretree/ormcp-docs) (also included in the source distribution)
 
 ## MCP Tools Reference
 
@@ -1075,8 +1058,7 @@ ORMCP Server provides the following MCP tools for interacting with your database
 
 **📖 Detailed API Documentation:** For complete parameter specifications and technical details, see the [MCP Tools API Reference](https://github.com/softwaretree/ormcp-docs/blob/main/reference/ormcp_tools_reference.md).
 
-**💡 Working Examples:** See real-world usage examples in the [examples directory](examples/).
-
+**💡 Working Examples:** See real-world usage examples in the [examples directory](/SoftwareTree/ormcp-docs/blob/main/examples).
 
 ### Core Operations
 
@@ -1091,45 +1073,49 @@ Retrieve information about the underlying object model.
 Query objects with filtering and relationship traversal.
 
 **Parameters:**
-- `className` (string): Type of objects to query
-- `filter` (string, optional): SQL-like WHERE clause for filtering
-- `maxObjects` (integer, optional): Maximum number of objects to retrieve (-1 for all, default: -1)
-- `deep` (boolean, optional): Include referenced objects in results (default: true)
-- `operationDetails` (string, optional): JSON array of operational directives for fine-tuning queries. Supports GraphQL-like operations such as:
-  - `projections`: Retrieve only specific attributes
-  - `ignore` or `follow`: Control referenced object branches
-  - `filter`: Apply filters to referenced objects
+
+* `className` (string): Type of objects to query
+* `filter` (string, optional): SQL-like WHERE clause for filtering
+* `maxObjects` (integer, optional): Maximum number of objects to retrieve (-1 for all, default: -1)
+* `deep` (boolean, optional): Include referenced objects in results (default: true)
+* `operationDetails` (string, optional): JSON array of operational directives for fine-tuning queries. Supports GraphQL-like operations such as:
+  + `projections`: Retrieve only specific attributes
+  + `ignore` or `follow`: Control referenced object branches
+  + `filter`: Apply filters to referenced objects
 
 #### `getObjectById`
 
 Retrieve a specific object by its primary key.
 
 **Parameters:**
-- `className` (string): Type of object to retrieve
-- `primaryKey` (object): Primary key values (single value or composite key object)
-- `deep` (boolean, optional): Include referenced objects (default: true)
-- `operationDetails` (string, optional): Operational directives for fine-tuning queries
+
+* `className` (string): Type of object to retrieve
+* `primaryKey` (object): Primary key values (single value or composite key object)
+* `deep` (boolean, optional): Include referenced objects (default: true)
+* `operationDetails` (string, optional): Operational directives for fine-tuning queries
 
 #### `access`
 
 Retrieve object(s) referenced by a specific attribute of a referencing object.
 
 **Parameters:**
-- `className` (string): Type of the referencing object
-- `jsonObject` (object): The referencing object containing the reference
-- `attributeName` (string): Name of the attribute whose referenced value(s) to retrieve
-- `deep` (boolean, optional): Include referenced objects of retrieved objects as well (default: true)
-- `operationDetails` (string, optional): Operational directives for fine-tuning queries
+
+* `className` (string): Type of the referencing object
+* `jsonObject` (object): The referencing object containing the reference
+* `attributeName` (string): Name of the attribute whose referenced value(s) to retrieve
+* `deep` (boolean, optional): Include referenced objects of retrieved objects as well (default: true)
+* `operationDetails` (string, optional): Operational directives for fine-tuning queries
 
 #### `getAggregate`
 
 Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
 
 **Parameters:**
-- `className` (string): Type of objects to aggregate
-- `attributeName` (string): Attribute to perform aggregation on
-- `aggregateType` (string): Type of aggregation - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`
-- `filter` (string, optional): SQL-like WHERE clause to filter objects before aggregation
+
+* `className` (string): Type of objects to aggregate
+* `attributeName` (string): Attribute to perform aggregation on
+* `aggregateType` (string): Type of aggregation - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`
+* `filter` (string, optional): SQL-like WHERE clause to filter objects before aggregation
 
 ### Data Modification Operations
 
@@ -1138,46 +1124,51 @@ Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
 Save one or more JSON objects to the database.
 
 **Parameters:**
-- `className` (string): Type of objects to insert
-- `jsonObjects` (array): List of JSON objects to save to the database
-- `deep` (boolean, optional): Save referenced objects as well (default: true)
+
+* `className` (string): Type of objects to insert
+* `jsonObjects` (array): List of JSON objects to save to the database
+* `deep` (boolean, optional): Save referenced objects as well (default: true)
 
 #### `update`
 
 Update one or more existing objects with new values.
 
 **Parameters:**
-- `className` (string): Type of objects to update
-- `jsonObjects` (array): List of objects with updated values (must include primary keys)
-- `deep` (boolean, optional): Update referenced objects as well (default: true)
+
+* `className` (string): Type of objects to update
+* `jsonObjects` (array): List of objects with updated values (must include primary keys)
+* `deep` (boolean, optional): Update referenced objects as well (default: true)
 
 #### `update2`
 
 Bulk update objects matching filter criteria.
 
 **Parameters:**
-- `className` (string): Type of objects to update
-- `filter` (string): SQL-like WHERE clause to identify objects to update
-- `newValues` (array): List of attribute names and their new values
-- `deep` (boolean, optional): Update referenced objects as well (default: true)
+
+* `className` (string): Type of objects to update
+* `filter` (string): SQL-like WHERE clause to identify objects to update
+* `newValues` (array): List of attribute names and their new values
+* `deep` (boolean, optional): Update referenced objects as well (default: true)
 
 #### `delete`
 
 Delete specific objects from the database.
 
 **Parameters:**
-- `className` (string): Type of objects to delete
-- `jsonObjects` (array): Objects to delete (primary keys required for identification)
-- `deep` (boolean, optional): Delete referenced objects as well (default: true)
+
+* `className` (string): Type of objects to delete
+* `jsonObjects` (array): Objects to delete (primary keys required for identification)
+* `deep` (boolean, optional): Delete referenced objects as well (default: true)
 
 #### `delete2`
 
 Bulk delete objects matching filter criteria.
 
 **Parameters:**
-- `className` (string): Type of objects to delete
-- `filter` (string, optional): SQL-like WHERE clause to identify objects to delete (empty string deletes all objects of the specified class)
-- `deep` (boolean, optional): Delete referenced objects as well (default: true)
+
+* `className` (string): Type of objects to delete
+* `filter` (string, optional): SQL-like WHERE clause to identify objects to delete (empty string deletes all objects of the specified class)
+* `deep` (boolean, optional): Delete referenced objects as well (default: true)
 
 **Note:** In `READONLY_MODE=True`, the MCP tools for data modification operations (`insert`, `update`, `update2`, `delete`, `delete2`) are not exposed to MCP clients.
 
@@ -1188,23 +1179,26 @@ For common issues and solutions, see the [Complete Troubleshooting Guide](https:
 ### Quick Troubleshooting
 
 **Installation Issues:**
-- Command not found → Add Python Scripts to PATH
-- Externally managed environment → Use virtual environment (see [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error))
-- Empty executable → Reinstall package
-- Missing dependencies → `pip install --force-reinstall ormcp-server`
+
+* Command not found → See your [platform guide](#-quick-start) for PATH configuration: [macOS](./guides/getting-started-mac.md#troubleshooting) · [Windows](./guides/getting-started-windows.md#troubleshooting) · [Linux](./guides/getting-started-linux.md#troubleshooting)
+* Externally managed environment → Use virtual environment (see [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error))
+* Empty executable → Reinstall package
+* Missing dependencies → `pip install --force-reinstall ormcp-server`
 
 **Gilhari Example Issues:**
-- Shell script permission denied → `chmod +x *.sh` or use `sh build.sh`
-- Database connection errors → Verify JDBC driver in Gilhari
+
+* Shell script permission denied → `chmod +x *.sh` or use `sh build.sh` (Linux/Mac)
+* Database connection errors → Verify JDBC driver in Gilhari
 
 **Runtime Issues:**
-- Server won't start → Check Gilhari is running
-- Database connection errors → Verify JDBC driver in Gilhari
-- MCP client connection issues → Check config file syntax
+
+* Server won't start → Check Gilhari is running
+* Database connection errors → Verify JDBC driver in Gilhari
+* MCP client connection issues → Check config file syntax
 
 **Enable Debug Mode:**
 
-```bash
+```
 # Linux/Mac
 export LOG_LEVEL=DEBUG
 ormcp-server
@@ -1219,9 +1213,10 @@ ormcp-server
 ```
 
 **Get Help:**
-- Documentation: [github.com/softwaretree/ormcp-docs](https://github.com/softwaretree/ormcp-docs)
-- Issues: [github.com/softwaretree/ormcp-docs/issues](https://github.com/softwaretree/ormcp-docs/issues)
-- Email: ormcp_support@softwaretree.com
+
+* Documentation: [github.com/softwaretree/ormcp-docs](https://github.com/softwaretree/ormcp-docs)
+* Issues: [github.com/softwaretree/ormcp-docs/issues](https://github.com/softwaretree/ormcp-docs/issues)
+* Email: [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
 
 ## Development
 
@@ -1231,7 +1226,7 @@ For testing and development with the source distribution:
 
 **Beta (Gemfury):**
 
-```bash
+```
 # Download source distribution
 # Note: --extra-index-url is required because build dependencies (like hatchling) 
 # are available on PyPI but not on Gemfury
@@ -1253,7 +1248,7 @@ Replace `YOUR_TOKEN` with your beta access token.
 
 **Production (PyPI) - available after beta:**
 
-```bash
+```
 # Download source distribution
 pip download --no-binary :all: ormcp-server
 tar -xzf ormcp_server-*.tar.gz
@@ -1270,12 +1265,12 @@ pytest
 
 * **ORMCP Server** leverages **Gilhari software**, a RESTful microservice framework for JSON data integration with databases.
 * You first create a custom Gilhari microservice based on the object relational data models of your application.
-* An object relational mapping (ORM) specification defines and controls the scope and shape of your object model corresponding to your relational model. 
+* An object relational mapping (ORM) specification defines and controls the scope and shape of your object model corresponding to your relational model.
 * The ORM specification is defined declaratively in a text file (.jdx) based on a simple grammar.
 * You may be able to reverse-engineer ORM specification from an existing database schema using tools/examples provided with Gilhari SDK. Check the `examples\JDX_ReverseEngineeringJSONExample` directory.
-* The reverse-engineering example is also available online at [github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample](https://github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample) 
+* The reverse-engineering example is also available online at [github.com/SoftwareTree/JDX\_ReverseEngineeringJSONExample](https://github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample)
 * For details on creating custom Gilhari microservices, refer to the Gilhari SDK documentation included in the source distribution package.
-* Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI_BASE_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls.
+* Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI\_BASE\_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls.
 
 ## Contributing
 
@@ -1288,51 +1283,54 @@ ORMCP Server is proprietary software. We are **not accepting** code contribution
 ### 🐞 Feedback and Bug Reports
 
 We **welcome feedback** on the beta version! You can help us improve ORMCP Server by:
-- Reporting bugs or issues
-- Suggesting improvements
-- Sharing your experience
+
+* Reporting bugs or issues
+* Suggesting improvements
+* Sharing your experience
 
 ### How to Provide Feedback
 
-- **GitHub Issues**: [Report issues or suggestions](https://github.com/softwaretree/ormcp-docs/issues)
-- **Email**: [ormcp_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
+* **GitHub Issues**: [Report issues or suggestions](https://github.com/softwaretree/ormcp-docs/issues)
+* **Email**: [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
 
 > Any feedback you provide may be used by Software Tree to improve the product, without any obligation to credit or compensate you.
 
 ## Third-Party Software
 
 **Gilhari Dependency:**
-ORMCP Server requires Gilhari microservice to function. Gilhari incorporates various third-party software components. For complete details of these third-party components and their licenses, see the LICENSE file in the Gilhari SDK or visit: https://www.softwaretree.com/v1/products/gilhari/
+ORMCP Server requires Gilhari microservice to function. Gilhari incorporates various third-party software components. For complete details of these third-party components and their licenses, see the LICENSE file in the Gilhari SDK or visit: <https://www.softwaretree.com/v1/products/gilhari/>
 
 **Python Dependencies:**
 ORMCP Server uses the following open-source Python libraries, each governed by their respective licenses:
-- mcp (Model Context Protocol SDK)
-- fastmcp (FastMCP framework)
-- httpx (HTTP client library)
-- pydantic (Data validation library)
-- uvicorn (ASGI server)
-- requests (HTTP library)
+
+* mcp (Model Context Protocol SDK)
+* fastmcp (FastMCP framework)
+* httpx (HTTP client library)
+* pydantic (Data validation library)
+* uvicorn (ASGI server)
+* requests (HTTP library)
 
 ## License
 
-ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICENSE](LICENSE) file for complete terms.
+ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICENSE](/SoftwareTree/ormcp-docs/blob/main/LICENSE) file for complete terms.
 
 **Beta Evaluation:** ORMCP Server is currently available as a beta product under an evaluation license. This allows free use for testing and evaluation purposes for a limited evaluation period (approximately 2 months from first use).
 
-**Gilhari Dependency:** ORMCP Server requires Gilhari microservice to function. By using ORMCP Server, you agree to comply with the Gilhari License Agreement as well. Gilhari incorporates various third-party software components. For details, see the LICENSE file in the Gilhari SDK or visit [https://www.softwaretree.com/v1/products/gilhari/](https://www.softwaretree.com/v1/products/gilhari/).
+**Gilhari Dependency:** ORMCP Server requires Gilhari microservice to function. By using ORMCP Server, you agree to comply with the Gilhari License Agreement as well. Gilhari incorporates various third-party software components. For details, see the LICENSE file in the Gilhari SDK or visit <https://www.softwaretree.com/v1/products/gilhari/>.
 
-**Commercial Licensing:** Commercial licensing terms will be announced at the time of commercial release. For information or to express interest, contact Software Tree at [ormcp_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) or visit [https://www.softwaretree.com](https://www.softwaretree.com).
+**Commercial Licensing:** Commercial licensing terms will be announced at the time of commercial release. For information or to express interest, contact Software Tree at [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) or visit <https://www.softwaretree.com>.
 
 ## Support & Resources
 
-- **Documentation**: [Complete documentation and guides](https://github.com/softwaretree/ormcp-docs)
-- **Working Examples**: [Browse Examples](examples/) | [Examples Guide](examples/README.md) - Real-world use cases and integrations
-- **Example Microservice**: [gilhari_example1 Repository](https://github.com/SoftwareTree/gilhari_example1)
-- **Bug Reports**: [Report issues](https://github.com/softwaretree/ormcp-docs/issues)
-- **Email Support**: [ormcp_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
-- **Gilhari Support**: [Software Tree Gilhari Documentation](https://www.softwaretree.com/v1/products/gilhari/gilhari_introduction.php)
-- **MCP Protocol**: [Official MCP Site](https://modelcontextprotocol.io/)
-- **Beta Access**: [Request token at softwaretree.com](https://www.softwaretree.com/products/ormcp)
+* **Documentation**: [Complete documentation and guides](https://github.com/softwaretree/ormcp-docs)
+* **Platform Guides**: [macOS](./guides/getting-started-mac.md) · [Windows](./guides/getting-started-windows.md) · [Linux](./guides/getting-started-linux.md)
+* **Working Examples**: [Browse Examples](/SoftwareTree/ormcp-docs/blob/main/examples) | [Examples Guide](/SoftwareTree/ormcp-docs/blob/main/examples/README.md) - Real-world use cases and integrations
+* **Example Microservice**: [gilhari\_example1 Repository](https://github.com/SoftwareTree/gilhari_example1)
+* **Bug Reports**: [Report issues](https://github.com/softwaretree/ormcp-docs/issues)
+* **Email Support**: [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
+* **Gilhari Support**: [Software Tree Gilhari Documentation](https://www.softwaretree.com/v1/products/gilhari/gilhari_introduction.php)
+* **MCP Protocol**: [Official MCP Site](https://modelcontextprotocol.io/)
+* **Beta Access**: [Request token at softwaretree.com](https://www.softwaretree.com/products/ormcp)
 
 ---
 
