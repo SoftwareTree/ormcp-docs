@@ -1,0 +1,63 @@
+{
+  "serverInfo": {
+    "name": "ORMCP Server",
+    "version": "1.0.0"
+  },
+  "authentication": {
+    "required": false
+  },
+  "tools": [
+    {
+      "name": "getObjectModelSummary",
+      "description": "Get schema information about the object model including classes, attributes, primary keys, and relationships.",
+      "inputSchema": { "type": "object", "properties": {} }
+    },
+    {
+      "name": "query",
+      "description": "Query business objects of a specific type with optional filtering and sorting.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" } }, "required": ["className"] }
+    },
+    {
+      "name": "getObjectById",
+      "description": "Retrieve a specific business object by its primary key.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "id": { "type": "string" } }, "required": ["className", "id"] }
+    },
+    {
+      "name": "getAggregate",
+      "description": "Calculate aggregate values (COUNT, SUM, AVG, MIN, MAX) across business objects.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "function": { "type": "string" }, "attribute": { "type": "string" } }, "required": ["className", "function"] }
+    },
+    {
+      "name": "access",
+      "description": "Retrieve objects referenced by a specific attribute of a referencing business object.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "id": { "type": "string" }, "attribute": { "type": "string" } }, "required": ["className", "id", "attribute"] }
+    },
+    {
+      "name": "insert",
+      "description": "Save one or more business objects to the database.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+    },
+    {
+      "name": "update",
+      "description": "Update one or more existing business objects.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+    },
+    {
+      "name": "update2",
+      "description": "Bulk update business objects matching a filter condition.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" }, "updates": { "type": "object" } }, "required": ["className", "updates"] }
+    },
+    {
+      "name": "delete",
+      "description": "Delete specific business objects from the database.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+    },
+    {
+      "name": "delete2",
+      "description": "Bulk delete business objects matching a filter condition.",
+      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" } }, "required": ["className"] }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}
