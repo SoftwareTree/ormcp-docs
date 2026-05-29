@@ -845,7 +845,7 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 
 ### Containerized Deployment (MCP Registries)
 
-For deployment via MCP registries such as [Glama](https://glama.ai/mcp/servers/SoftwareTree/ormcp-docs), a `start.sh` script is provided in the root of this repository. It handles installing and launching ORMCP Server in a containerized environment. See the script for required environment variables and configuration details.
+For deployment via MCP registries such as [Glama](https://glama.ai/mcp/servers/SoftwareTree/ormcp-docs), a [`start.sh`](https://github.com/SoftwareTree/ormcp-docs/blob/main/start.sh) script is provided in the root of this repository. It handles installing and launching ORMCP Server in a containerized environment. See the script for required environment variables and configuration details.
 
 ## MCP Client Configuration
 
