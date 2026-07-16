@@ -35,7 +35,7 @@ Solutions to common issues and problems.
 > **🎯 Most Common Issues:**
 > - [Externally managed environment (Linux)](#externally-managed-environment-error)
 > - [Command not found](#command-not-found)
-> - [401 Unauthorized (token)](#401-unauthorized-error-gemfury)
+> - [401 Unauthorized (legacy Gemfury installs)](#401-unauthorized-error-gemfury)
 
 ---
 
@@ -64,9 +64,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # Now install ORMCP Server
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 **Alternative: Use pipx (for command-line tools)**
@@ -78,19 +76,14 @@ sudo apt install pipx  # Ubuntu/Debian
 sudo dnf install pipx  # Fedora
 
 # Install ORMCP Server with pipx
-pipx install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --pip-args="--extra-index-url https://pypi.org/simple" \
-  ormcp-server
+pipx install ormcp-server
 ```
 
 **Not Recommended: Override with --break-system-packages**
 
 ```bash
 # Only use if you understand the risks
-pip3 install --break-system-packages \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip3 install --break-system-packages ormcp-server
 ```
 
 ⚠️ **Warning:** This can cause conflicts with system packages and break your Python installation. Always prefer virtual environments or pipx.
@@ -151,18 +144,14 @@ python3.12 -m venv .venv
 source .venv/bin/activate
 
 # pip will now use Python 3.12
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 **3. Use python3.12 -m pip directly:**
 
 ```bash
 # Instead of pip3 install, use:
-python3.12 -m pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+python3.12 -m pip install ormcp-server
 ```
 
 ---
@@ -288,45 +277,23 @@ source .venv/bin/activate  # Linux/Mac
 
 ### 401 Unauthorized Error (Gemfury)
 
-**Problem:** `401 Unauthorized` when installing from Gemfury
+**This issue only applies to old Gemfury-token installs.** ORMCP Server is now published on public PyPI — `pip install ormcp-server` needs no token and won't hit this error.
 
-**Symptoms:**
-- `HTTP Error 401: Unauthorized`
-- Cannot access package index
+**If you're still running an old command** like `pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ... ormcp-server` and getting `401 Unauthorized`:
 
-**Solutions:**
+1. **Switch to the plain install command** — this is the real fix:
+   ```bash
+   pip install ormcp-server
+   ```
+2. **Check pip configuration for a leftover Gemfury entry:**
+   ```bash
+   # Linux/Mac
+   cat ~/.pip/pip.conf
 
-**1. Verify token:**
-- Check you copied the complete token (no extra spaces)
-- Ensure token hasn't expired
-- Try pasting in text editor first to check for hidden characters
-
-**2. Use correct command format:**
-
-```bash
-# Ensure both --index-url and --extra-index-url are included
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-**3. Request new token:**
-- Contact ormcp_support@softwaretree.com
-- Visit https://www.softwaretree.com to request new beta access
-
-**4. Check pip configuration:**
-
-Ensure no conflicting configuration:
-
-```bash
-# Linux/Mac
-cat ~/.pip/pip.conf
-
-# Windows
-type %APPDATA%\pip\pip.ini
-```
-
-Remove any conflicting `index-url` settings.
+   # Windows
+   type %APPDATA%\pip\pip.ini
+   ```
+   Remove any `index-url` line pointing at `pypi.fury.io` — it's no longer needed and can conflict with a plain `pip install ormcp-server`.
 
 ---
 
@@ -346,9 +313,7 @@ pip uninstall ormcp-server
 pip cache purge
 
 # Reinstall
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 
 # Verify
 pip show ormcp-server
@@ -374,10 +339,7 @@ ormcp-server --help
 
 ```bash
 # Reinstall with force
-pip install --force-reinstall \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install --force-reinstall ormcp-server
 
 # Verify dependencies
 pip show ormcp-server
@@ -390,17 +352,14 @@ pip show ormcp-server
 pip install requests  # or other missing package
 
 # Then reinstall ORMCP Server
-pip install --force-reinstall \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install --force-reinstall ormcp-server
 ```
 
 ---
 
 ### SSL Certificate Error
 
-**Problem:** SSL verification failed when connecting to Gemfury
+**Problem:** SSL verification failed when connecting to PyPI
 
 **Solutions:**
 
@@ -409,15 +368,7 @@ pip install --force-reinstall \
 pip install --upgrade certifi
 ```
 
-**2. Temporary bypass (not recommended for production):**
-```bash
-pip install --trusted-host pypi.fury.io \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-**3. Check system time:**
+**2. Check system time:**
 - Ensure system date/time is correct
 - Incorrect time can cause SSL certificate validation failures
 

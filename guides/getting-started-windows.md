@@ -26,12 +26,8 @@ REM Create and activate a virtual environment
 python -m venv .venv
 .venv\Scripts\activate
 
-REM Install ORMCP Server (Beta — replace YOUR_TOKEN with your beta access token)
-REM Note: --extra-index-url is required because build dependencies (like hatchling)
-REM are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ^
-  --extra-index-url https://pypi.org/simple ^
-  ormcp-server
+REM Install ORMCP Server — no token needed, pulls from public PyPI
+pip install ormcp-server
 
 REM Verify installation
 pip show ormcp-server
@@ -44,20 +40,14 @@ pip show ormcp-server
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 
-# Install ORMCP Server (Beta — replace YOUR_TOKEN with your beta access token)
-# Note: --extra-index-url is required because build dependencies (like hatchling)
-# are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ `
-  --extra-index-url https://pypi.org/simple `
-  ormcp-server
+# Install ORMCP Server — no token needed, pulls from public PyPI
+pip install ormcp-server
 
 # Verify installation
 pip show ormcp-server
 ```
 
-Request your beta access token at [softwaretree.com/products/ormcp](https://www.softwaretree.com/products/ormcp).
-
-> **Production (after beta):** `pip install ormcp-server`
+**If you have an existing Gemfury token** from an earlier beta install, it still works, but it's no longer required.
 
 ### Global Installation (Optional)
 
@@ -66,17 +56,13 @@ For a global install without a virtual environment, the `ormcp-server` executabl
 **Command Prompt:**
 
 ```cmd
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ^
-  --extra-index-url https://pypi.org/simple ^
-  ormcp-server
+pip install ormcp-server
 ```
 
 **PowerShell:**
 
 ```powershell
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ `
-  --extra-index-url https://pypi.org/simple `
-  ormcp-server
+pip install ormcp-server
 ```
 
 ---
@@ -118,9 +104,7 @@ To connect ORMCP to your own database and data model, follow the Gilhari SDK doc
 
 ```cmd
 REM Download the source distribution to access the full SDK
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ^
-  --extra-index-url https://pypi.org/simple ^
-  ormcp-server
+pip download --no-binary :all: ormcp-server
 
 REM Extract the .tar.gz file
 REM If you have tar available (Windows 10+):

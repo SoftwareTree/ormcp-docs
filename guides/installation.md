@@ -29,20 +29,9 @@ Complete installation instructions for ORMCP Server.
 
 ---
 
-## Installation Methods
+## Installation
 
-### Method 1: Gemfury Private PyPI (Beta)
-
-ORMCP Server beta is distributed via Gemfury, a private PyPI repository.
-
-#### Step 1: Request Beta Access
-
-Visit [softwaretree.com/products/ormcp](https://www.softwaretree.com) to request beta access. You'll receive:
-- Beta access token
-- Evaluation period information
-- Welcome email with instructions
-
-#### Step 2: Install with Token
+ORMCP Server is published on the public PyPI index. No account, token, or beta-access request is needed to install it.
 
 **Quick Installation (Recommended):**
 ```bash
@@ -54,42 +43,13 @@ source .venv/bin/activate  # Linux/Mac
 # or
 .venv\Scripts\activate     # Windows
 
-# Install ORMCP Server from Gemfury
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-Replace `YOUR_TOKEN` with your beta access token.
-
-**Alternative: Configure pip Permanently**
-
-This avoids typing the token every time:
-
-**Linux/Mac:**
-Create or edit `~/.pip/pip.conf`:
-```ini
-[global]
-index-url = https://YOUR_TOKEN@pypi.fury.io/softwaretree/
-extra-index-url = https://pypi.org/simple
-```
-
-**Windows:**
-Create or edit `%APPDATA%\pip\pip.ini`:
-```ini
-[global]
-index-url = https://YOUR_TOKEN@pypi.fury.io/softwaretree/
-extra-index-url = https://pypi.org/simple
-```
-
-Then install normally:
-```bash
+# Install ORMCP Server
 pip install ormcp-server
 ```
 
-#### Step 3: Verify Installation
+**If you have an existing Gemfury token** from an earlier beta install, it still works, but it's no longer required — the plain `pip install ormcp-server` command above installs from public PyPI directly.
+
+#### Verify Installation
 
 ```bash
 # Check installation
@@ -99,24 +59,8 @@ pip show ormcp-server
 ormcp-server --help
 
 # Expected output:
-# ORMCP Server v0.4.x
+# ORMCP Server v0.6.x
 # Usage: ormcp-server [OPTIONS]
-```
-
----
-
-### Method 2: PyPI (Production) - Coming Soon
-
-After beta, ORMCP Server will be available on the main PyPI repository:
-
-```bash
-# Virtual environment (recommended)
-python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-.venv\Scripts\activate     # Windows
-
-# Install
-pip install ormcp-server
 ```
 
 ---
@@ -145,14 +89,7 @@ source .venv/bin/activate
 ### Install ORMCP Server
 
 ```bash
-# Beta (Gemfury)
-# Note: --extra-index-url is required for build dependencies
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-
-# Production (PyPI) - coming soon
-# pip install ormcp-server
+pip install ormcp-server
 ```
 
 ### Deactivate When Done
@@ -194,10 +131,7 @@ Then **restart your terminal**.
 
 ```bash
 # Using Command Prompt or PowerShell
-# Note: --extra-index-url is required for build dependencies
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 #### 4. Verify
@@ -242,10 +176,7 @@ sudo pacman -S python
 python3.12 -m venv .venv
 source .venv/bin/activate
 
-# Note: --extra-index-url is required for build dependencies
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 #### 3. Add to PATH (if needed)
@@ -281,10 +212,7 @@ https://www.python.org/downloads/macos/
 python3.12 -m venv .venv
 source .venv/bin/activate
 
-# Note: --extra-index-url is required for build dependencies
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 #### 3. Add to PATH (if needed)
@@ -300,16 +228,6 @@ source ~/.zshrc  # or source ~/.bash_profile
 ---
 
 ## Troubleshooting Installation
-
-### Issue: 401 Unauthorized Error
-
-**Problem:** `401 Unauthorized` when installing from Gemfury
-
-**Solutions:**
-1. **Verify token** - Check you copied the complete token
-2. **Check expiration** - Request new token if expired
-3. **Try direct URL** - Use full index URL with token
-4. **Contact support** - Email ormcp_support@softwaretree.com
 
 ### Issue: Command Not Found
 
@@ -355,11 +273,7 @@ python -m ormcp_server
 **Solution:** Uninstall and reinstall:
 ```bash
 pip uninstall ormcp-server
-
-# Note: --extra-index-url is required for build dependencies
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 ```
 
 This can happen due to antivirus interference during installation.
@@ -371,11 +285,7 @@ This can happen due to antivirus interference during installation.
 **Solution:**
 ```bash
 # Reinstall with dependencies
-# Note: --extra-index-url is required for build dependencies
-pip install --force-reinstall \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install --force-reinstall ormcp-server
 
 # Or install missing dependency directly
 pip install requests
@@ -385,38 +295,21 @@ pip show ormcp-server
 # Check "Requires" line shows: fastmcp, httpx, mcp, pydantic, uvicorn, requests
 ```
 
-### Issue: Build Dependencies Not Found
-
-**Problem:** `ERROR: Could not find a version that satisfies the requirement hatchling` or similar build errors
-
-**Solution:**
-
-This happens when `--extra-index-url` is missing. Ensure you include it:
-
-```bash
-# Correct command with both flags
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-Or configure pip permanently (see "Alternative: Configure pip Permanently" section above).
-
 ### Issue: SSL Certificate Error
 
-**Problem:** SSL verification failed when connecting to Gemfury
+**Problem:** SSL verification failed when connecting to PyPI
 
 **Solution:**
 ```bash
-# Temporarily bypass SSL (not recommended for production)
-pip install --trusted-host pypi.fury.io \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-
-# Better: Update certificates
+# Update certificates (usually resolves this)
 pip install --upgrade certifi
 ```
+
+If it persists, check your system clock — an incorrect date/time can cause SSL certificate validation failures.
+
+### Legacy: Gemfury Token Issues
+
+**If you're still using an old Gemfury-token install command** (`--index-url https://YOUR_TOKEN@pypi.fury.io/...`), you can drop it — `pip install ormcp-server` now installs from public PyPI and needs no token. If you were hitting `401 Unauthorized`, a missing `hatchling`/build-dependency error, or an SSL error specifically tied to `pypi.fury.io`, switching to the plain `pip install ormcp-server` command resolves all three.
 
 ---
 
@@ -437,8 +330,8 @@ After installation:
 - Email: ormcp_support@softwaretree.com
 - GitHub Issues: [Report a problem](https://github.com/softwaretree/ormcp-docs/issues)
 
-**Beta Access:**
-- Request token: [softwaretree.com/products/ormcp](https://www.softwaretree.com)
+**Install ORMCP Server:**
+- `pip install ormcp-server` — no token needed. See [softwaretree.com/products/ormcp](https://www.softwaretree.com/v1/products/ormcp/download.php) for full setup instructions.
 
 ---
 

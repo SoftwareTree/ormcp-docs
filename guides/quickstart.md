@@ -12,7 +12,6 @@ Before starting, ensure you have:
 
 - **Python 3.12+** installed
 - **Docker** installed and running
-- **Beta access token** for Gemfury (request at [softwaretree.com/products/ormcp](https://www.softwaretree.com))
 
 ---
 
@@ -49,68 +48,15 @@ source .venv/bin/activate  # Linux/Mac
 # or
 .venv\Scripts\activate     # Windows
 
-# Install ORMCP Server from Gemfury (Beta)
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-# Install ORMCP Server from Gemfury (Beta)
-# Set your token as an environment variable first (keeps it out of shell history)
-
-# Linux/Mac:
-export ORMCP_TOKEN=your_token_here
-pip install --index-url https://$ORMCP_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-
-# Windows (Command Prompt):
-set ORMCP_TOKEN=your_token_here
-pip install --index-url https://%ORMCP_TOKEN%@pypi.fury.io/softwaretree/ ^
-  --extra-index-url https://pypi.org/simple ^
-  ormcp-server
-
-# Windows (PowerShell):
-$env:ORMCP_TOKEN="your_token_here"
-pip install --index-url "https://$env:ORMCP_TOKEN@pypi.fury.io/softwaretree/" `
-  --extra-index-url https://pypi.org/simple `
-  ormcp-server
-
-```
-
-#### Optional: Store token in pip config (avoids setting it every time)
-
-**Linux/Mac** — create or edit `~/.config/pip/pip.conf`:
-```ini
-[global]
-extra-index-url = https://your_token_here@pypi.fury.io/softwaretree/
-```
-
-**Windows** — create or edit `%APPDATA%\pip\pip.ini`:
-```ini
-[global]
-extra-index-url = https://your_token_here@pypi.fury.io/softwaretree/
-```
-
-After doing this, future installs and upgrades only need:
-```bash
-pip install ormcp-server
-```
-This also makes the plain `pip install ormcp-server` command work seamlessly
-once you migrate to PyPI — just remove the config entry.
-
-
-# Verify installation:**
-```bash
-pip show ormcp-server
-ormcp-server --help
-```
-
-**For Production Users (PyPI):**
-```bash
-# Install from PyPI (available after beta)
+# Install ORMCP Server — no token needed, pulls from public PyPI
 pip install ormcp-server
 
 # Verify installation
 pip show ormcp-server
+ormcp-server --help
 ```
+
+**If you have an existing Gemfury token** from an earlier beta install, it still works, but it's no longer required.
 
 📖 **Need help?** See the [Installation Guide](installation.md)
 

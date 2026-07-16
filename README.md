@@ -121,23 +121,14 @@ Learn more at the [Official MCP Website](https://modelcontextprotocol.io/).
 > **Platform-specific guides** with step-by-step install instructions for your OS:
 > [macOS](./guides/getting-started-mac.md) · [Windows](./guides/getting-started-windows.md) · [Linux](./guides/getting-started-linux.md)
 
-**For Beta Users (Gemfury Private PyPI):**
-
-Request beta access and receive your token at: [softwaretree.com/products/ormcp](https://www.softwaretree.com)
+ORMCP Server is available on public PyPI. No account, token, or beta-access request is needed to install it:
 
 ```
-# Install with token
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip install ormcp-server
 
 # Verify installation
 pip show ormcp-server
 ```
-
-Replace `YOUR_TOKEN` with your beta access token.
 
 > **📌 Linux/Mac Users:** Modern Linux distributions and macOS may require virtual environments. See your [platform guide](#-quick-start) or the [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error) if you get "externally-managed-environment" errors.
 
@@ -152,21 +143,11 @@ source .venv/bin/activate
 # Activate — Windows (PowerShell):
 .venv\Scripts\Activate.ps1
 
-# Install with token
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-**For Production Users (PyPI):**
-
-```
-# Install from PyPI (available after beta)
+# Install
 pip install ormcp-server
-
-# Verify installation
-pip show ormcp-server
 ```
+
+**If you have an existing Gemfury token** from an earlier beta install, it will continue to work, but it's no longer required — the plain `pip install ormcp-server` command above pulls from public PyPI.
 
 **If `ormcp-server` command is not found after installation:**
 
@@ -440,35 +421,11 @@ source .venv/bin/activate
 # Windows (PowerShell):
 .venv\Scripts\Activate.ps1
 
-# Install ORMCP Server
-# Beta (Gemfury):
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-
-# Production (PyPI) - available after beta:
-# pip install ormcp-server
+# Install ORMCP Server from public PyPI — no token needed
+pip install ormcp-server
 ```
-
-Replace `YOUR_TOKEN` with your beta access token from [softwaretree.com/products/ormcp](https://www.softwaretree.com).
 
 ### Global Installation
-
-**Beta (Gemfury):**
-
-```
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-```
-
-Replace `YOUR_TOKEN` with your beta access token.
-
-**Production (PyPI) - available after beta:**
 
 ```
 pip install ormcp-server
@@ -480,16 +437,9 @@ pip install ormcp-server
 
 To access the complete package including Gilhari SDK, examples, and documentation:
 
-**Beta (Gemfury):**
-
 ```
 # Download source distribution
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip download --no-binary :all: \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip download --no-binary :all: ormcp-server
 
 # Extract it (use the appropriate version number)
 tar -xzf ormcp_server-*.tar.gz
@@ -502,24 +452,11 @@ cd ormcp_server-*/
 # - package/docs/         (Additional documentation)
 ```
 
-Replace `YOUR_TOKEN` with your beta access token.
-
-**Production (PyPI) - available after beta:**
-
-```
-# Download source distribution
-pip download --no-binary :all: ormcp-server
-
-# Extract it
-tar -xzf ormcp_server-*.tar.gz
-cd ormcp_server-*/
-```
-
 **Windows users:** If you don't have `tar` installed, you can:
 
 * Use 7-Zip or WinRAR to extract the .tar.gz file
 * Or use PowerShell: `tar -xzf ormcp_server-*.tar.gz`
-* Or download directly from the Gemfury/PyPI website
+* Or download directly from the [PyPI project page](https://pypi.org/project/ormcp-server/)
 
 ## Package Contents
 
@@ -549,22 +486,15 @@ The complete package includes:
 
 ### Accessing the Full Package
 
-**Option 1: Download from PyPI/Gemfury**
-
-**Beta (Gemfury):**
+**Option 1: Download from PyPI**
 
 ```
 # Download the source distribution (.tar.gz)
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip download --no-binary :all: \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip download --no-binary :all: ormcp-server
 
-# Extract it (use the appropriate version number; e.g., 0.5.x)
-tar -xzf ormcp_server-0.5.x.tar.gz
-cd ormcp_server-0.5.x
+# Extract it (use the appropriate version number; e.g., 0.6.x)
+tar -xzf ormcp_server-0.6.x.tar.gz
+cd ormcp_server-0.6.x
 
 # Now you have access to:
 # - Gilhari_SDK/
@@ -573,30 +503,15 @@ cd ormcp_server-0.5.x
 # - package/docs/
 ```
 
-Replace `YOUR_TOKEN` with your beta access token.
-
-**Production (PyPI) - available after beta:**
-
-```
-# Download the source distribution
-pip download --no-binary :all: ormcp-server
-
-# Extract it
-tar -xzf ormcp_server-*.tar.gz
-cd ormcp_server-*/
-```
-
 **Windows users:** If you don't have `tar` installed, you can:
 
 * Use 7-Zip or WinRAR to extract the .tar.gz file
-* Or use PowerShell: `tar -xzf ormcp_server-0.5.x.tar.gz`
-* Or download directly from the Gemfury/PyPI website
+* Or use PowerShell: `tar -xzf ormcp_server-0.6.x.tar.gz`
+* Or download directly from the PyPI project page
 
 **Option 2: Download from Package Page**
 
-**Beta:** Contact [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) for direct download links.
-
-**Production (after beta):** Visit <https://pypi.org/project/ormcp-server/> and download the `.tar.gz` file.
+Visit <https://pypi.org/project/ormcp-server/> and download the `.tar.gz` file.
 
 Look for the "Download files" section and download the source distribution (`.tar.gz`).
 
@@ -730,12 +645,7 @@ python -m ormcp_server
 **Note:** Requires source distribution. Download with:
 
 ```
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip download --no-binary :all: \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
+pip download --no-binary :all: ormcp-server
 tar -xzf ormcp_server-*.tar.gz
 cd ormcp_server-*/
 ```
@@ -1228,30 +1138,6 @@ ormcp-server
 
 For testing and development with the source distribution:
 
-**Beta (Gemfury):**
-
-```
-# Download source distribution
-# Note: --extra-index-url is required because build dependencies (like hatchling) 
-# are available on PyPI but not on Gemfury
-pip download --no-binary :all: \
-  --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  ormcp-server
-tar -xzf ormcp_server-*.tar.gz
-cd ormcp_server-*/
-
-# Install in development mode
-pip install -e ".[dev]"
-
-# Run tests (if available in source distribution)
-pytest
-```
-
-Replace `YOUR_TOKEN` with your beta access token.
-
-**Production (PyPI) - available after beta:**
-
 ```
 # Download source distribution
 pip download --no-binary :all: ormcp-server
@@ -1301,8 +1187,8 @@ We **welcome feedback** on the beta version! You can help us improve ORMCP Serve
 
 ## Third-Party Software
 
-**Gilhari Dependency:**
-ORMCP Server requires Gilhari microservice to function. Gilhari incorporates various third-party software components. For complete details of these third-party components and their licenses, see the LICENSE file in the Gilhari SDK or visit: <https://www.softwaretree.com/v1/products/gilhari/>
+**Gilhari and JDX Dependency:**
+ORMCP Server requires the Gilhari microservice to function, which in turn depends on JDX, the underlying ORM technology used by Gilhari. Both are proprietary Software Tree products. Gilhari and JDX incorporate various third-party software components. For complete details of these third-party components and their licenses, see the LICENSE file in the Gilhari SDK, or visit: <https://www.softwaretree.com/v1/products/gilhari/> and <https://www.softwaretree.com/v1/products/jdx/jdx.html>
 
 **Python Dependencies:**
 ORMCP Server uses the following open-source Python libraries, each governed by their respective licenses:
@@ -1320,7 +1206,7 @@ ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICEN
 
 **Beta Evaluation:** ORMCP Server is currently available as a beta product under an evaluation license. This allows free use for testing and evaluation purposes for a limited evaluation period (approximately 2 months from first use).
 
-**Gilhari Dependency:** ORMCP Server requires Gilhari microservice to function. By using ORMCP Server, you agree to comply with the Gilhari License Agreement as well. Gilhari incorporates various third-party software components. For details, see the LICENSE file in the Gilhari SDK or visit <https://www.softwaretree.com/v1/products/gilhari/>.
+**Gilhari and JDX Dependency:** ORMCP Server requires the Gilhari microservice to function, which in turn depends on JDX, the underlying ORM technology used by Gilhari. Both are proprietary Software Tree products under their own license agreements. By using ORMCP Server, you agree to comply with the Gilhari License and the JDX License as well. Gilhari and JDX incorporate various third-party software components — for details, see the LICENSE file in the Gilhari SDK, or visit <https://www.softwaretree.com/v1/products/gilhari/> and <https://www.softwaretree.com/v1/products/jdx/jdx.html>.
 
 **Commercial Licensing:** Commercial licensing terms will be announced at the time of commercial release. For information or to express interest, contact Software Tree at [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) or visit <https://www.softwaretree.com>.
 
@@ -1334,7 +1220,7 @@ ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICEN
 * **Email Support**: [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)
 * **Gilhari Support**: [Software Tree Gilhari Documentation](https://www.softwaretree.com/v1/products/gilhari/gilhari_introduction.php)
 * **MCP Protocol**: [Official MCP Site](https://modelcontextprotocol.io/)
-* **Beta Access**: [Request token at softwaretree.com](https://www.softwaretree.com/products/ormcp)
+* **Install ORMCP Server**: `pip install ormcp-server` — no beta token needed. See [softwaretree.com/products/ormcp](https://www.softwaretree.com/v1/products/ormcp/download.php) for full setup instructions.
 
 ---
 
