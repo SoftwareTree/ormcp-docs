@@ -31,7 +31,7 @@ python src\ormcp_server.py --transport stdio
 
 Or if using a different command:
 ```bash
-./ormcp_server --mode stdio
+./ormcp_server --transport stdio
 ```
 
 ### Step 2: Send Messages via stdin

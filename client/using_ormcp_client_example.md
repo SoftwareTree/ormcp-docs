@@ -113,13 +113,13 @@ HTTP mode allows ORMCP Server to run as a standalone web service.
 In one terminal window:
 
 ```bash
-ormcp-server --mode http --port 8080
+ormcp-server --transport http --port 8080
 ```
 
 Or:
 
 ```bash
-python -m ormcp_server --mode http --port 8080
+python -m ormcp_server --transport http --port 8080
 ```
 
 You should see:
@@ -533,7 +533,7 @@ python ormcp_client_example.py --mode stdio --demo
 3. **Try different port:**
    ```bash
    # Server
-   ormcp-server --mode http --port 9000
+   ormcp-server --transport http --port 9000
    
    # Client
    python ormcp_client_example.py --mode http --url http://127.0.0.1:9000 --demo

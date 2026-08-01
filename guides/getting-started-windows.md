@@ -205,7 +205,7 @@ REM Using Python directly (always works)
 python -m ormcp_server
 
 REM HTTP mode (experimental)
-ormcp-server --mode http --port 8080
+ormcp-server --transport http --port 8080
 ```
 
 ---
@@ -292,7 +292,7 @@ If you installed into a virtual environment:
 
 ### Gemini CLI
 
-Add to your Gemini `settings.json`. Note that Gemini CLI currently requires HTTP mode, so start ORMCP with `--mode http` first:
+Add to your Gemini `settings.json`. Note that Gemini CLI currently requires HTTP mode, so start ORMCP with `--transport http` first:
 
 ```json
 {

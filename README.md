@@ -698,7 +698,7 @@ This allows you to interactively test and explore ORMCP Server tools without nee
 
 ### HTTP or SSE Transport Support
 
-> **Note:** Currently only the `stdio` transport is fully supported out of the box. Support for HTTP or SSE transports is experimental.
+> **Note:** ORMCP defaults to `stdio` transport, which is what most desktop AI clients (e.g., Claude Desktop) use out of the box. HTTP mode (Streamable HTTP transport) is also fully supported for standalone/networked deployments — see the [HTTP mode interaction guide](https://github.com/SoftwareTree/ormcp-docs/blob/main/docs/Interacting_With_ORMCP_Server_In_HTTP_Mode.md) for details. Some clients (e.g., Gemini CLI) currently require HTTP mode.
 
 You can start the ORMCP server in HTTP mode from the command line:
 
@@ -707,7 +707,7 @@ You can start the ORMCP server in HTTP mode from the command line:
 python src/ormcp_server.py --transport http
 
 # Or using the CLI
-ormcp-server --mode http
+ormcp-server --transport http
 ```
 
 **Customize host and port:**
@@ -716,12 +716,12 @@ ormcp-server --mode http
 python src/ormcp_server.py --transport http --host 0.0.0.0 --port 9000
 
 # Or using CLI
-ormcp-server --mode http --host 0.0.0.0 --port 9000
+ormcp-server --transport http --host 0.0.0.0 --port 9000
 ```
 
 **Available command-line options:**
 
-* `--mode` / `--transport`: Choose between "stdio" (default) or "http"
+* `--transport`: Choose between "stdio" (default) or "http"
 * `--host`: Set the host address (default: 127.0.0.1, only used in HTTP mode)
 * `--port`: Set the port number (default: 8080, only used in HTTP mode)
 
@@ -730,7 +730,7 @@ ormcp-server --mode http --host 0.0.0.0 --port 9000
 ```
 python src/ormcp_server.py --transport http
 # or
-ormcp-server --mode http
+ormcp-server --transport http
 ```
 
 Make sure you have `uvicorn` installed as a dependency since HTTP mode uses it to serve the application.
@@ -859,7 +859,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 }
 ```
 
-#### Option 5: HTTP Mode (Experimental)
+#### Option 5: HTTP Mode
 
 ```
 {
@@ -867,7 +867,7 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
     "my-ormcp-server-http": {
       "command": "ormcp-server",
       "args": [
-        "--mode", "http",
+        "--transport", "http",
         "--port", "8080"
       ],
       "env": {
@@ -928,7 +928,7 @@ To connect the ORMCP server to a custom GPT in developer mode, the server must b
 
      ```
      # Run from the project's root directory
-     ormcp-server --mode http --port 8080
+     ormcp-server --transport http --port 8080
      ```
 3. **Expose the Server with a Public URL:**
    OpenAI's servers need a public web address to reach your local ORMCP server. Use a tunneling service like `cloudflared` or `ngrok` to create a secure public URL that forwards to your local machine.
