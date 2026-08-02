@@ -18,6 +18,7 @@ Solutions to common issues and problems.
   - [401 Unauthorized Error (Gemfury)](#401-unauthorized-error-gemfury)
   - [Empty Executable File (0 bytes)](#empty-executable-file-0-bytes)
   - [Missing Dependencies](#missing-dependencies)
+  - [fastmcp Import Error After Upgrade](#fastmcp-import-error-after-upgrade)
   - [SSL Certificate Error](#ssl-certificate-error)
 - [Connection Problems](#connection-problems)
 - [Configuration Issues](#configuration-issues)
@@ -357,6 +358,56 @@ pip install --force-reinstall ormcp-server
 
 ---
 
+### fastmcp Import Error After Upgrade
+
+**Problem:** After running `pip install --upgrade ormcp-server`, the server fails to start with:
+
+```
+ImportError: cannot import name 'FastMCP' from 'fastmcp' (unknown location)
+```
+
+**This only affects upgrades from ORMCP Server v0.6.2 or earlier.** If you're already on v0.6.3 or later, a plain upgrade won't hit this. If you're installing for the first time, you won't hit it either — it's specific to upgrading *across* this particular version boundary.
+
+**Cause:** Between v0.6.2 and the current release, the `fastmcp` dependency was restructured into two packages (`fastmcp` + `fastmcp-slim`). Upgrading in place over an old `fastmcp` install can leave it in a broken, half-migrated state — `fastmcp` resolves as an empty namespace package with no actual code behind it.
+
+**Solution:**
+
+```bash
+pip install --upgrade ormcp-server
+pip uninstall fastmcp fastmcp-slim -y
+pip install "fastmcp>=3.4.5,<4.0"
+ormcp-server --version
+```
+
+The third line reinstalls `fastmcp` cleanly regardless of what state the upgrade left it in — safe to run even if you're not sure it's needed. (Keep the quotes around the version range — `>` and `<` are redirection characters in most shells, including Windows `cmd.exe`, so `pip install fastmcp>=3.4.5,<4.0` without quotes will fail or do something unexpected.)
+
+**If that doesn't fix it**, do a full clean reinstall instead:
+
+```bash
+pip uninstall ormcp-server fastmcp fastmcp-slim -y
+pip cache purge
+pip install "ormcp-server>=0.6.6"
+```
+
+**Verifying the fix — don't rely on `pip check` or `pip list` alone:**
+
+```bash
+pip check
+```
+
+can report success even when this exact problem is present — it only checks that declared version *requirements* are satisfied, not that the installed package's modules actually import correctly. The real test is:
+
+```bash
+python -c "from fastmcp import FastMCP"
+```
+
+If this runs with no output, the fix worked. If it raises the same `ImportError`, `fastmcp` is still broken.
+
+**Related Issues:**
+- If you have more than one Python installed, see [Python Version Issues](#python-version-issues)
+
+---
+
 ### SSL Certificate Error
 
 **Problem:** SSL verification failed when connecting to PyPI
@@ -560,6 +611,44 @@ which ormcp-server
 - Server startup errors
 - Connection failures
 - Environment variable issues
+
+---
+
+### HTTP Mode: 421 Misdirected Request
+
+**Problem:** In HTTP mode (`--transport http`), requests fail with:
+
+```
+HTTP/1.1 421 Misdirected Request
+```
+
+**Cause:** As of v0.6.5, ORMCP enables Host/Origin protection by default in HTTP mode — a security guard that rejects requests whose `Host` header doesn't match an expected value (localhost variants, by default). This is intentional: it protects the server against DNS-rebinding-style attacks. A 421 means the guard is working correctly, not that something is broken.
+
+**This is expected, not a bug, if** you're accessing ORMCP from something other than `127.0.0.1`/`localhost` — e.g. through a reverse proxy, a container's internal hostname (`host.docker.internal`), or from a different machine on the network.
+
+**Solution — allow the specific hostname(s) you need:**
+
+```bash
+export ALLOWED_HOSTS=host.docker.internal,your-hostname-here
+ormcp-server --transport http
+```
+
+**If you need to disable the guard entirely** (not recommended outside local, trusted-network testing):
+
+```bash
+export HOST_ORIGIN_PROTECTION=false
+```
+
+**Checking what's actually configured:** ORMCP logs its Host/Origin protection setting at startup:
+
+```
+🔒 Host/Origin protection: True
+```
+
+**Note (v0.6.6+):** If `HOST_ORIGIN_PROTECTION` is set to an unrecognized value (a typo, or an unsupported value), ORMCP now fails *closed* — protection stays enabled, and a warning is logged naming the bad value — rather than silently disabling protection the way earlier versions could. If you see a startup warning like `HOST_ORIGIN_PROTECTION='...' is not a recognized value`, check your spelling; accepted values are `true`/`1`/`yes`/`on`/`strict`, `false`/`0`/`no`/`off`, or `auto`.
+
+**Related Issues:**
+- For general connection issues, see [Gilhari Connection Refused](#gilhari-connection-refused) or [MCP Client Connection Issues](#mcp-client-connection-issues)
 
 ---
 

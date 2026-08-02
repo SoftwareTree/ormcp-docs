@@ -1098,6 +1098,7 @@ For common issues and solutions, see the [Complete Troubleshooting Guide](https:
 * Externally managed environment → Use virtual environment (see [troubleshooting guide](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#externally-managed-environment-error))
 * Empty executable → Reinstall package
 * Missing dependencies → `pip install --force-reinstall ormcp-server`
+* Upgrading from v0.6.2 or earlier and getting a `fastmcp` `ImportError` → See [fastmcp Import Error After Upgrade](https://github.com/softwaretree/ormcp-docs/blob/main/guides/troubleshooting.md#fastmcp-import-error-after-upgrade)
 
 **Gilhari Example Issues:**
 
