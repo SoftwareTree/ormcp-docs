@@ -1205,11 +1205,11 @@ ORMCP Server uses the following open-source Python libraries, each governed by t
 
 ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICENSE](/SoftwareTree/ormcp-docs/blob/main/LICENSE) file for complete terms.
 
-**Beta Evaluation:** ORMCP Server is currently available as a beta product under an evaluation license. This allows free use for testing and evaluation purposes for a limited evaluation period (30 days from first use).
+**Beta Evaluation:** ORMCP Server is currently available as a beta product under an evaluation license. This allows free use for testing and evaluation purposes for a limited evaluation period (30 days from the date of installation).
 
 **Gilhari and JDX Dependency:** ORMCP Server requires the Gilhari microservice to function, which in turn depends on JDX, the underlying ORM technology used by Gilhari. Both are proprietary Software Tree products under their own license agreements. By using ORMCP Server, you agree to comply with the Gilhari License and the JDX License as well. Gilhari and JDX incorporate various third-party software components — for details, see the LICENSE file in the Gilhari SDK, or visit <https://www.softwaretree.com/v1/products/gilhari/> and <https://www.softwaretree.com/v1/products/jdx/jdx.html>.
 
-**Commercial Licensing:** Commercial licensing terms will be announced at the time of commercial release. For information or to express interest, contact Software Tree at [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) or visit <https://www.softwaretree.com>.
+**Commercial Licensing:** Use of ORMCP Server beyond the evaluation period is subject to then-applicable Software Tree licensing terms. For information or to express interest, contact Software Tree at [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com) or visit <https://www.softwaretree.com>.
 
 ## Support & Resources
 
