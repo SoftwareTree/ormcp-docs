@@ -278,7 +278,7 @@ source .venv/bin/activate  # Linux/Mac
 
 ### 401 Unauthorized Error (Gemfury)
 
-**This issue only applies to old Gemfury-token installs.** ORMCP Server is now published on public PyPI — `pip install ormcp-server` needs no token and won't hit this error.
+**Gemfury access has been discontinued.** Any install command using `pypi.fury.io` will now fail (401 Unauthorized or connection error), regardless of whether your token was previously valid. This is expected — switch to `pip install ormcp-server`, which installs from public PyPI and needs no token.
 
 **If you're still running an old command** like `pip install --index-url https://YOUR_TOKEN@pypi.fury.io/softwaretree/ ... ormcp-server` and getting `401 Unauthorized`:
 

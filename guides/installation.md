@@ -47,7 +47,7 @@ source .venv/bin/activate  # Linux/Mac
 pip install ormcp-server
 ```
 
-**If you have an existing Gemfury token** from an earlier beta install, it still works, but it's no longer required — the plain `pip install ormcp-server` command above installs from public PyPI directly.
+**If you have an existing Gemfury token** from an earlier beta install, it will no longer work — Gemfury access has been discontinued. Use `pip install ormcp-server`, which installs from public PyPI directly.
 
 #### Verify Installation
 
@@ -309,7 +309,7 @@ If it persists, check your system clock — an incorrect date/time can cause SSL
 
 ### Legacy: Gemfury Token Issues
 
-**If you're still using an old Gemfury-token install command** (`--index-url https://YOUR_TOKEN@pypi.fury.io/...`), you can drop it — `pip install ormcp-server` now installs from public PyPI and needs no token. If you were hitting `401 Unauthorized`, a missing `hatchling`/build-dependency error, or an SSL error specifically tied to `pypi.fury.io`, switching to the plain `pip install ormcp-server` command resolves all three.
+**If you're still using an old Gemfury-token install command** (`--index-url https://YOUR_TOKEN@pypi.fury.io/...`), it will now fail — Gemfury access has been discontinued and any request to `pypi.fury.io` will error out. Switch to `pip install ormcp-server`, which installs from public PyPI and needs no token.
 
 ---
 

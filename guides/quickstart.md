@@ -56,7 +56,7 @@ pip show ormcp-server
 ormcp-server --help
 ```
 
-**If you have an existing Gemfury token** from an earlier beta install, it still works, but it's no longer required.
+**If you have an existing Gemfury token** from an earlier beta install, it will no longer work — Gemfury access has been discontinued. Use `pip install ormcp-server`.
 
 📖 **Need help?** See the [Installation Guide](installation.md)
 

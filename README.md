@@ -147,7 +147,7 @@ source .venv/bin/activate
 pip install ormcp-server
 ```
 
-**If you have an existing Gemfury token** from an earlier beta install, it will continue to work, but it's no longer required — the plain `pip install ormcp-server` command above pulls from public PyPI.
+**If you have an existing Gemfury token** from an earlier beta install, it will no longer work — Gemfury access has been discontinued. Use `pip install ormcp-server`, which pulls from public PyPI directly.
 
 **If `ormcp-server` command is not found after installation:**
 
