@@ -2,6 +2,8 @@ Copyright (c) 2025, Software Tree
 
 # ORMCP Server Quick Start Guide
 
+_Last updated: 2026-09-15 7:06 PM PDT_
+
 Get up and running with ORMCP Server in minutes.
 
 ---
@@ -260,6 +262,8 @@ Here are all the users in the database:
 
 ### 5. Try Data Modification
 
+> **Note:** This step requires `READONLY_MODE=False` (see [Read-Only Mode](#read-only-mode) above) — `insert` and the other data-modification tools are not exposed with the default `READONLY_MODE=True`.
+
 > "Add a new user: Sarah Johnson from Seattle, WA, age 42, id 100"
 
 **Behind the scenes:**
@@ -421,21 +425,21 @@ CREATE TABLE users (
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` | `MyORMCPServer` |
 | `GILHARI_TIMEOUT` | API timeout (seconds) | `30` | `60` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` | `DEBUG`, `WARNING`, `ERROR` |
-| `READONLY_MODE` | Expose only read operations | `False` | `True` |
+| `READONLY_MODE` | Expose only read operations | `True` | `False` |
 
 ### Read-Only Mode
 
-To prevent data modifications:
+`READONLY_MODE` defaults to `True`: `insert`, `update`, `update2`, `delete`, and `delete2` are **not** exposed as MCP tools unless you explicitly allow writes.
+
+To allow data modifications:
 
 ```bash
 # Linux/Mac
-export READONLY_MODE="True"
+export READONLY_MODE="False"
 
 # Windows
-set READONLY_MODE=True
+set READONLY_MODE=False
 ```
-
-This disables `insert`, `update`, `update2`, `delete`, and `delete2` tools.
 
 ---
 

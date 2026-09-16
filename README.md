@@ -2,6 +2,8 @@ Copyright (c) 2025, Software Tree
 
 # ORMCP Server - Beta
 
+_Last updated: 2026-09-15 7:06 PM PDT_
+
 *A Model Context Protocol (MCP) Server to connect your AI applications to relational databases*
 
 ORMCP Server enables AI LLMs and MCP clients to easily exchange object-oriented data (in JSON format) with any relational database using the MCP standard protocol.
@@ -302,6 +304,8 @@ You're ready! Your AI client can now interact with your database using natural l
 
 ### Insert Data
 
+> **Note:** `insert` (like the other data-modification tools) is only exposed when `READONLY_MODE=False` is set — see [Configuration for ORMCP Server](#configuration-for-ormcp-server). With the default `READONLY_MODE=True`, this example's MCP call won't be available to the client.
+
 **AI Prompt:** *"Add a new User (id = 65) named John Smith of Boston, MA with age of 65"*
 
 **Generated MCP Call:**
@@ -571,7 +575,7 @@ Configure via environment variables:
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` | `MyCompanyORMCP` |
 | `GILHARI_TIMEOUT` | API timeout (seconds) | `30` | `60` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` | `DEBUG`, `WARNING`, `ERROR` |
-| `READONLY_MODE` | Expose only read operations | `False` | `True` |
+| `READONLY_MODE` | Expose only read operations | `True` | `False` |
 | `GILHARI_NAME` | Name of the app-specific Gilhari microservice | "" | `my-gilhari-microservice` |
 | `GILHARI_IMAGE` | Docker image name of the app-specific Gilhari microservice | "" | `gilhari_example1:1.0` |
 | `GILHARI_HOST` | IP address of the host machine for Gilhari microservice | `localhost` | `10.20.30.40` |
@@ -579,7 +583,7 @@ Configure via environment variables:
 
 **Notes:**
 
-* If `READONLY_MODE` is set to `True`, the MCP tools that can potentially modify the data (e.g., insert, update, update2, delete, delete2) are not exposed by the **ORMCP server** to the MCP client. By default, all MCP tools are exposed.
+* `READONLY_MODE` defaults to `True`: the MCP tools that can potentially modify data (`insert`, `update`, `update2`, `delete`, `delete2`) are **not** exposed by the **ORMCP server** to the MCP client unless you explicitly set `READONLY_MODE=False`.
 * `GILHARI_BASE_URL` and `GILHARI_NAME` are used to probe an already running Gilhari microservice container
 * `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` are used to run a new instance of Gilhari microservice if an existing microservice is not found. Please make sure that the values of `GILHARI_HOST` and `GILHARI_PORT` variables match the corresponding values in `GILHARI_BASE_URL` setting because that is where the **ORMCP server** will contact the Gilhari microservice.
 
@@ -1033,6 +1037,8 @@ Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
 
 ### Data Modification Operations
 
+> **Note:** These tools are only exposed if `READONLY_MODE=False` is set — `READONLY_MODE` defaults to `True`, so `insert`, `update`, `update2`, `delete`, and `delete2` are **not** available out of the box. See [Configuration for ORMCP Server](#configuration-for-ormcp-server) above.
+
 #### `insert`
 
 Save one or more JSON objects to the database.
@@ -1084,7 +1090,7 @@ Bulk delete objects matching filter criteria.
 * `filter` (string, optional): SQL-like WHERE clause to identify objects to delete (empty string deletes all objects of the specified class)
 * `deep` (boolean, optional): Delete referenced objects as well (default: true)
 
-**Note:** In `READONLY_MODE=True`, the MCP tools for data modification operations (`insert`, `update`, `update2`, `delete`, `delete2`) are not exposed to MCP clients.
+**Note:** `READONLY_MODE` defaults to `True`, so the MCP tools for data modification operations (`insert`, `update`, `update2`, `delete`, `delete2`) are **not** exposed to MCP clients unless you explicitly set `READONLY_MODE=False`.
 
 ## Troubleshooting
 

@@ -1,5 +1,7 @@
 # Getting Started with ORMCP Server on macOS
 
+_Last updated: 2026-09-15 7:06 PM PDT_
+
 > **Platform-specific guide** — This page consolidates all macOS instructions in one place.
 > For the complete multi-platform reference, see the [main README](../README.md).
 
@@ -108,7 +110,7 @@ export MCP_SERVER_NAME="MyORMCPServer"
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` |
 | `GILHARI_TIMEOUT` | API timeout in seconds | `30` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` |
-| `READONLY_MODE` | Expose only read operations | `False` |
+| `READONLY_MODE` | Expose only read operations | `True` |
 | `GILHARI_NAME` | Name of the Gilhari container | `""` |
 | `GILHARI_IMAGE` | Docker image for Gilhari | `""` |
 | `GILHARI_HOST` | Host IP for Gilhari | `localhost` |
