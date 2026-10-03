@@ -110,11 +110,14 @@ export MCP_SERVER_NAME="MyORMCPServer"
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` |
 | `GILHARI_TIMEOUT` | API timeout in seconds | `30` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` |
+| `ORMCP_LOG_FILE` | Log file, in addition to the console; `none` for console only | `ormcp_server_debug.log` in `$TMPDIR` (a per-user folder under `/var/folders/`) |
 | `READONLY_MODE` | Expose only read operations | `True` |
-| `GILHARI_NAME` | Name of the Gilhari container | `""` |
+| `GILHARI_NAME` | Name of the Gilhari container | `my-gilhari-microservice` |
 | `GILHARI_IMAGE` | Docker image for Gilhari | `""` |
-| `GILHARI_HOST` | Host IP for Gilhari | `localhost` |
-| `GILHARI_PORT` | Port for Gilhari | `80` |
+| `GILHARI_HOST` | Overrides the host in `GILHARI_BASE_URL` for the start-up check (rarely needed) | host in `GILHARI_BASE_URL` |
+| `GILHARI_PORT` | Overrides the port in `GILHARI_BASE_URL` for the start-up check (rarely needed) | port in `GILHARI_BASE_URL` |
+
+`GILHARI_BASE_URL` is usually the only Gilhari setting you need: since ORMCP 0.7.0 the start-up check uses its host and port.
 
 To make these variables permanent, add the `export` lines to your `~/.zshrc` (macOS default since Catalina) or `~/.bashrc`:
 
@@ -143,12 +146,15 @@ Then start the server:
 ormcp-server
 ```
 
-**Expected output:**
+**Expected output** (abbreviated):
 
 ```
-[INFO] ORMCP server name: MyORMCPServer
-[INFO] GILHARI BASE URL: http://localhost:80/gilhari/v1/
-[INFO] ORMCP server v0.5.x starting in stdio mode ...
+... - INFO - Checking the Gilhari microservice at http://localhost:80/gilhari/v1/health/check
+... - INFO - Gilhari microservice is available
+... - INFO - ORMCP server name: MyORMCPServer
+... - INFO - GILHARI BASE URL: http://localhost:80/gilhari/v1/
+... - INFO - Log file: <temp directory>/ormcp_server_debug.log
+🟢 ORMCP server v0.7.0 starting in stdio mode...
 ```
 
 ### Alternative Start Methods
@@ -160,7 +166,7 @@ ormcp-server
 # Using Python directly (always works)
 python -m ormcp_server
 
-# HTTP mode (experimental)
+# HTTP mode (for HTTP-based clients)
 ormcp-server --transport http --port 8080
 ```
 
@@ -254,8 +260,8 @@ Add to your Gemini `settings.json`. Note that Gemini CLI currently requires HTTP
 ### Other MCP Clients
 
 Configure using the appropriate transport (STDIO or HTTP) per your client's requirements. See:
-- [Interacting with ORMCP Server in STDIO Mode](./Interacting_With_ORMCP_Server_In_STDIO_Mode.md)
-- [Interacting with ORMCP Server in HTTP Mode](./Interacting_With_ORMCP_Server_In_HTTP_Mode.md)
+- [Interacting with ORMCP Server in STDIO Mode](../docs/Interacting_With_ORMCP_Server_In_STDIO_Mode.md)
+- [Interacting with ORMCP Server in HTTP Mode](../docs/Interacting_With_ORMCP_Server_In_HTTP_Mode.md)
 
 ---
 
@@ -302,10 +308,21 @@ ormcp-server
 
 ### Server won't start
 
-Verify Gilhari is running and accessible:
+If ORMCP stops with `Failed to ensure Gilhari microservice availability at ... (probed ...)`, no Gilhari microservice answered at that address; the 💡 line after it says what to do. Verify Gilhari is running and accessible at the port in `GILHARI_BASE_URL`:
 
 ```bash
 curl -i http://localhost:80/gilhari/v1/getObjectModelSummary/now
+docker ps
+```
+
+`docker ps` shows the container's host port: `0.0.0.0:8130->8081/tcp` means `GILHARI_BASE_URL` must use port 8130.
+
+### Log file
+
+ORMCP also logs to `ormcp_server_debug.log` in `$TMPDIR` (a per-user folder under `/var/folders/`) (or to `ORMCP_LOG_FILE`). To view it:
+
+```bash
+cat "$TMPDIR/ormcp_server_debug.log"
 ```
 
 For more, see the [Complete Troubleshooting Guide](./troubleshooting.md).
@@ -316,7 +333,7 @@ For more, see the [Complete Troubleshooting Guide](./troubleshooting.md).
 
 - [Main README](../README.md) — Complete multi-platform reference
 - [MCP Tools API Reference](../reference/ormcp_tools_reference.md)
-- [MCP Protocol Reference](./mcp_protocol_reference.md)
+- [MCP Protocol Reference](../docs/mcp_protocol_reference.md)
 - [Example Gilhari Microservice](https://github.com/SoftwareTree/gilhari_example1)
 - [Bug Reports & Feedback](https://github.com/softwaretree/ormcp-docs/issues)
 - Email: [ormcp_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)

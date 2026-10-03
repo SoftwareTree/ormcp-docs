@@ -1,20 +1,25 @@
 #!/bin/bash
 # start.sh
-# 
+#
 # Startup script for ORMCP Server in containerized environments.
-# Used by Glama and other MCP registries to install and launch 
+# Used by Glama and other MCP registries to install and launch
 # ORMCP Server with the required dependencies.
 #
-# Required environment variables:
-#   GEMFURY_TOKEN   - Beta access token for installing ormcp-server
-#   GILHARI_IMAGE   - Docker image for the Gilhari microservice
-#   GILHARI_HOST    - Host for Gilhari (use host.docker.internal in Docker)
-#   GILHARI_PORT    - Port for Gilhari microservice (default: 80)
-#   GILHARI_BASE_URL - Full URL for Gilhari microservice
+# ORMCP Server is installed from public PyPI; no access token is needed.
+#
+# Environment variables:
+#   GILHARI_BASE_URL - URL of the Gilhari microservice, e.g.
+#                      http://host.docker.internal:80/gilhari/v1/
+#                      (required unless the default
+#                      http://localhost:80/gilhari/v1/ is right)
+#   GILHARI_IMAGE    - Optional: Docker image of the Gilhari microservice,
+#                      if ORMCP should start it when none is running
+#   READONLY_MODE    - Optional: "false" to expose the data-modification
+#                      tools (default "true")
+#
+# Since ORMCP 0.7.0 the host and port for ORMCP's start-up check come from
+# GILHARI_BASE_URL; GILHARI_HOST / GILHARI_PORT are only overrides.
 
 uv venv /opt/venv && \
-uv pip install ormcp-server \
-  --index-url https://${GEMFURY_TOKEN}@pypi.fury.io/softwaretree/ \
-  --extra-index-url https://pypi.org/simple \
-  --python /opt/venv/bin/python && \
+uv pip install ormcp-server --python /opt/venv/bin/python && \
 mcp-proxy -- /opt/venv/bin/python -m ormcp_server

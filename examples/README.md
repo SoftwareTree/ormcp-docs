@@ -341,6 +341,8 @@ Use natural language to interact with the example data:
 "Delete all users older than 50"
 ```
 
+The last two need the data-modification tools, which ORMCP exposes only with `READONLY_MODE=false` (the default is `true`).
+
 ---
 
 ## Learning Path
@@ -478,6 +480,8 @@ CREATE DATABASE mydb;
 -- Gilhari will create tables automatically if jdx_force_create_schema is true
 ```
 
+`jdx_force_create_schema: "true"` drops and recreates the mapped tables at every start, so use it only with a new, empty database like this one. The `USER`/`PASSWORD` in the `.jdx` file become part of the Docker image; for anything beyond a local test, pass them at container start instead — see [Database Credentials](../guides/gilhari_setup.md#database-credentials).
+
 **5. Rebuild and Run**
 
 ```bash
@@ -574,13 +578,13 @@ docker logs -f <container-id>
 **Verify Gilhari is Running:**
 ```bash
 curl http://localhost:80/gilhari/v1/health/check
-# Should return: {"status": "Gilhari REST Server is up and running"}
+# Should return something like: {"status":"healthy","service_name":"gilhari_example1","version":"0.8.9",...}
 ```
 
 **Check Object Model Summary:**
 ```bash
 curl http://localhost:80/gilhari/v1/getObjectModelSummary/now
-# Should return JSON with class definitions
+# Should return a text summary of the classes (CLASS ..., ATTRIB ..., PRIMARY_KEY ...)
 ```
 
 **Verify Environment Variable:**
@@ -591,7 +595,8 @@ echo $GILHARI_BASE_URL
 ```
 
 **Check ORMCP Server Logs:**
-- ORMCP server logs connection attempts
+- ORMCP checks the Gilhari microservice at start-up; if it can't reach it, it stops with a message naming the address it checked
+- Its log is also in `ormcp_server_debug.log` in the system's temp directory (or `ORMCP_LOG_FILE`)
 - Verify the URL matches the running Gilhari instance
 
 ### Database Connection Issues

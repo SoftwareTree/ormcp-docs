@@ -11,13 +11,14 @@ The `ormcp_client_example.py` script demonstrates how to connect to ORMCP Server
 
 Before running the client example, ensure you have:
 
-1. **ORMCP Server installed:**
+1. **ORMCP Server and the client's two libraries installed:**
    ```bash
    pip install ormcp-server
+   pip install requests psutil
    ```
 
 2. **Gilhari microservice running:**
-   - See the [Gilhari Setup Guide](../README.md#gilhari-microservice-setup)
+   - See the [Gilhari Setup Guide](../guides/gilhari_setup.md)
    - Example: [gilhari_example1](https://github.com/SoftwareTree/gilhari_example1)
    ```bash
    docker run -p 80:8081 gilhari_example1:1.0
@@ -34,6 +35,8 @@ Before running the client example, ensure you have:
    # Windows (PowerShell)
    $env:GILHARI_BASE_URL="http://localhost:80/gilhari/v1/"
    ```
+
+   ORMCP checks at start-up that a Gilhari microservice answers at `GILHARI_BASE_URL`; if none does, it stops with a message naming the address it checked.
 
 ## Getting the Client Example
 
@@ -56,13 +59,13 @@ cd ormcp_server-*/client/
 STDIO mode is the simplest way to test ORMCP Server locally.
 
 ```bash
-# Using default server command
+# Using the default server command (ormcp-server)
 python ormcp_client_example.py --mode stdio --demo
 
 # Using custom server command
 python ormcp_client_example.py --mode stdio --server_cmd "ormcp-server" --demo
 
-# Connect to already running server by PID
+# Start another server with the same command line as process 12345
 python ormcp_client_example.py --mode stdio --server_pid 12345 --demo
 ```
 
@@ -90,7 +93,7 @@ python ormcp_client_example.py --mode stdio --server_pid 12345 --demo
 🎯 Starting demo session...
 
 🔧 Listing available tools...
-📋 Found 9 tool(s):
+📋 Found 7 tool(s):
   1. getObjectModelSummary - Get information about the underlying object model...
   2. query - Query all qualifying objects...
   
@@ -104,7 +107,9 @@ python ormcp_client_example.py --mode stdio --server_pid 12345 --demo
 Demo completed successfully!
 ```
 
-## Running in HTTP Mode (Experimental)
+With the default `READONLY_MODE=true`, ORMCP lists 7 tools; with `READONLY_MODE=false`, 12 (the 5 data-modification tools are added). A failing tool call is shown as `❌ Tool error: <message>`.
+
+## Running in HTTP Mode
 
 HTTP mode allows ORMCP Server to run as a standalone web service.
 
@@ -125,8 +130,8 @@ python -m ormcp_server --transport http --port 8080
 You should see:
 
 ```
-[INFO] ORMCP server v0.4.3 starting in http mode...
-[INFO] Server running at http://127.0.0.1:8080
+🟢 ORMCP server v0.7.0 starting in HTTP mode on 127.0.0.1:8080...
+INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
 ```
 
 ### Step 2: Run the Client
@@ -149,7 +154,7 @@ python ormcp_client_example.py --mode http --url http://127.0.0.1:8080 --demo
 1. ORMCP Server runs as a standalone HTTP service
 2. Client connects via HTTP to the `/mcp` endpoint
 3. The client automatically:
-   - Adds `/mcp/` to the URL if needed
+   - Adds `/mcp` to the URL if needed (without a trailing slash; `/mcp/` is answered with a redirect)
    - Manages session tokens
    - Handles Server-Sent Events (SSE) responses
    - Sends required MCP protocol notifications
@@ -157,7 +162,7 @@ python ormcp_client_example.py --mode http --url http://127.0.0.1:8080 --demo
 ### HTTP Mode Output
 
 ```
-✅ Successfully connected to http://127.0.0.1:8080/mcp/
+✅ Successfully connected to http://127.0.0.1:8080/mcp
 📋 Session ID: abc123def456
 
 🎯 Starting demo session...
@@ -176,7 +181,7 @@ The `--demo` flag runs an automated demonstration session:
 
 ### 1. Connection Initialization
 - Establishes connection (stdio or HTTP)
-- Sends `initialize` request with protocol version `2024-11-05`
+- Sends `initialize` request with protocol version `2025-06-18`
 - Sends `initialized` notification
 - Confirms connection is ready
 
@@ -317,12 +322,16 @@ result = client.call_tool("update", {
         {
             "id": 999,
             "name": "Updated Name",
-            "age": 26
+            "age": 26,
+            "city": "San Francisco",
+            "state": "CA"
         }
     ],
     "deep": False
 })
 ```
+
+`update` replaces each stored object with the one given (matched by primary key), so include all of its attributes. To change only some attributes, use `update2` with a filter on the primary key.
 
 ### Example: Delete Data
 
@@ -360,7 +369,7 @@ python ormcp_client_example.py --mode stdio --demo
 # 2. Start new server with custom command
 python ormcp_client_example.py --mode stdio --server_cmd "ormcp-server" --demo
 
-# 3. Connect to already running server by PID
+# 3. Start another server with the same command line as process 12345
 python ormcp_client_example.py --mode stdio --server_pid 12345 --demo
 
 # HTTP mode options
@@ -375,8 +384,8 @@ python ormcp_client_example.py --mode http --url http://localhost:9000 --demo
 **Available Arguments:**
 
 - `--mode` - Connection mode: `stdio` or `http` (default: `stdio`)
-- `--server_cmd` - Command to start MCP server for stdio mode (has a default)
-- `--server_pid` - Connect to existing MCP server by process ID
+- `--server_cmd` - Command to start MCP server for stdio mode (default: `ormcp-server`)
+- `--server_pid` - Start a new MCP server with the same command line as the process with this ID. A running stdio server's input and output can't be attached to from outside, so this does not connect to that process itself.
 - `--url` - URL of HTTP MCP server (default: `http://127.0.0.1:8080`)
 - `--demo` - Run automated demo session (list and call tools)
 
@@ -457,7 +466,7 @@ python ormcp_client_example.py --mode stdio --demo
 
 ### Tool Call Failures
 
-**Problem:** `Tool execution failed` or `Class not found`
+**Problem:** `❌ Tool error: ...` (for example `Error calling tool 'query': HTTP 404: ...`)
 
 **Solutions:**
 
@@ -504,18 +513,7 @@ python ormcp_client_example.py --mode stdio --demo
 
 1. **Increase initialization wait time** - Edit the code to wait longer than 2 seconds
 2. **Check server actually started** - Look for server initialization messages
-3. **Try connecting to existing server:**
-   ```bash
-   # Start server separately
-   ormcp-server
-   
-   # In another terminal, get the PID
-   ps aux | grep ormcp-server  # Linux/Mac
-   tasklist | findstr ormcp    # Windows
-   
-   # Connect to it
-   python ormcp_client_example.py --mode stdio --server_pid <PID> --demo
-   ```
+3. **Check that the server can reach Gilhari:** if it exits right after starting, its stderr (shown with the 🛑 prefix) contains `Failed to ensure Gilhari microservice availability at ...`; start Gilhari or correct `GILHARI_BASE_URL`
 
 ### HTTP Mode Issues
 
@@ -525,8 +523,11 @@ python ormcp_client_example.py --mode stdio --demo
 
 1. **Verify HTTP server is running:**
    ```bash
-   curl http://127.0.0.1:8080/mcp
+   curl -i http://127.0.0.1:8080/mcp
    ```
+   A `406 Not Acceptable` response is expected here (a plain request without the MCP headers) and shows the server is up.
+
+   A `421 Misdirected Request` means ORMCP's Host/Origin protection rejected the request's host name; add it to `ALLOWED_HOSTS` when starting ORMCP.
 
 2. **Check firewall settings** - Allow port 8080
 
@@ -558,6 +559,9 @@ set LOG_LEVEL=DEBUG     # Windows
 
 # Then run client
 python ormcp_client_example.py --mode stdio --demo
+
+# The server's log is also in its log file:
+# ormcp_server_debug.log in the system's temp directory (or ORMCP_LOG_FILE)
 ```
 
 **What you'll see:**

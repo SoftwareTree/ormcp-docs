@@ -9,8 +9,10 @@ This guide explains how to interact with an ORMCP (Model Context Protocol) serve
 When your ORMCP server starts in stdio mode, it typically:
 - Reads JSON-RPC messages from stdin (standard input)
 - Writes responses to stdout (standard output) 
-- May write logs to stderr (standard error)
+- Writes its logs to stderr (standard error) and to its log file (`ormcp_server_debug.log` in the system's temp directory, or `ORMCP_LOG_FILE`)
 - Does not bind to any network port
+
+**Before starting:** the Gilhari microservice must be running at `GILHARI_BASE_URL` (default `http://localhost:80/gilhari/v1/`). ORMCP checks this at start-up; if no microservice answers, it writes a message naming the address it checked to stderr and exits, so it never reads stdin.
 
 ## Understanding stdio Mode
 
@@ -25,13 +27,11 @@ In stdio mode:
 
 ### Step 1: Start the ORMCP Server
 ```bash
-# Start your ORMCP server in stdio mode (default mode)
-python src\ormcp_server.py --transport stdio
-```
+# Installed package (stdio is the default transport)
+ormcp-server
 
-Or if using a different command:
-```bash
-./ormcp_server --transport stdio
+# Or from the source distribution
+python src/ormcp_server.py --transport stdio
 ```
 
 ### Step 2: Send Messages via stdin
@@ -39,7 +39,7 @@ Once the ORMCP server is running, you can type JSON-RPC messages directly:
 
 **Initialize the connection:**
 ```json
-{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"manual-client","version":"1.0.0"}}}
+{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"manual-client","version":"1.0.0"}}}
 ```
 
 **Send initialized notification:**
@@ -68,21 +68,15 @@ Once the ORMCP server is running, you can type JSON-RPC messages directly:
 ### Basic Interaction Script
 ```bash
 #!/bin/bash
-
-# Start the server in background
-python src\ormcp_server.py --transport stdio &
-SERVER_PID=$!
-
-# Function to send message
-send_message() {
-    echo "$1" 
-}
-
-# Initialize
-send_message '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"pipe-client","version":"1.0.0"}}}' | python your_mcp_server.py --transport stdio
-
-# Clean up
-kill $SERVER_PID
+# Pipe a short session into the server; responses appear on stdout,
+# logs on stderr (redirected to a file here). The server exits when
+# its stdin is closed at the end of the session.
+{
+  echo '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"pipe-client","version":"1.0.0"}}}'
+  echo '{"jsonrpc":"2.0","method":"notifications/initialized"}'
+  echo '{"jsonrpc":"2.0","id":"2","method":"tools/list"}'
+  sleep 2
+} | ormcp-server 2> ormcp_stderr.log
 ```
 
 ### Using Named Pipes (Advanced)
@@ -92,11 +86,11 @@ mkfifo server_input
 mkfifo server_output
 
 # Start server with pipes
-python src\ormcp_server.py --transport stdio < server_input > server_output &
+ormcp-server < server_input > server_output &
 SERVER_PID=$!
 
 # Send messages
-echo '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"pipe-client","version":"1.0.0"}}}' > server_input
+echo '{"jsonrpc":"2.0","id":"1","method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"pipe-client","version":"1.0.0"}}}' > server_input
 
 # Read responses
 cat server_output &
@@ -197,7 +191,8 @@ class MCPStdioClient:
 
 def main():
     # Replace with your server command
-    server_cmd = ["python", "src\ormcp_server.py", "--transport stdio"]
+    # Installed package; or ["python", "src/ormcp_server.py", "--transport", "stdio"]
+    server_cmd = ["ormcp-server"]
     
     client = MCPStdioClient(server_cmd)
     
@@ -209,7 +204,7 @@ def main():
             "id": "1",
             "method": "initialize",
             "params": {
-                "protocolVersion": "2024-11-05",
+                "protocolVersion": "2025-06-18",
                 "capabilities": {},
                 "clientInfo": {"name": "python-client", "version": "1.0.0"}
             }
@@ -352,7 +347,7 @@ class MCPStdioClient {
             id: this.messageId++,
             method: "initialize",
             params: {
-                protocolVersion: "2024-11-05",
+                protocolVersion: "2025-06-18",
                 capabilities: {},
                 clientInfo: {name: "node-client", version: "1.0.0"}
             }
@@ -428,7 +423,8 @@ class MCPStdioClient {
 
 async function main() {
     // Replace with your server command
-    const client = new MCPStdioClient('python', ['src\ormcp_server.py', '--transport stdio']);
+    // Installed package; or new MCPStdioClient('python', ['src/ormcp_server.py', '--transport', 'stdio'])
+    const client = new MCPStdioClient('ormcp-server', []);
     
     try {
         console.log('=== Initializing ===');
@@ -530,7 +526,7 @@ function Start-MCPClient {
             id = "1"
             method = "initialize"
             params = @{
-                protocolVersion = "2024-11-05"
+                protocolVersion = "2025-06-18"
                 capabilities = @{}
                 clientInfo = @{
                     name = "powershell-client"
@@ -565,14 +561,14 @@ function Start-MCPClient {
         $messageId = 3
         
         while ($true) {
-            $input = Read-Host "`nEnter JSON message (or 'quit')"
+            $userInput = Read-Host "`nEnter JSON message (or 'quit')"
             
-            if ($input -eq "quit") {
+            if ($userInput -eq "quit") {
                 break
             }
             
             try {
-                $message = $input | ConvertFrom-Json
+                $message = $userInput | ConvertFrom-Json
                 if (-not $message.id -and $message.method -ne "notifications/initialized") {
                     $message | Add-Member -Name "id" -Value $messageId.ToString() -MemberType NoteProperty
                     $messageId++
@@ -606,13 +602,13 @@ Start-MCPClient -ServerPath "ormcp_server.py"
 | **Session Management** | Session ID in headers | Process-bound session |
 | **Debugging** | Network tools, browser devtools | Process monitoring, logs |
 | **Scaling** | Multiple concurrent clients | One client per server process |
-| **Error Handling** | HTTP status codes | JSON-RPC error responses |
+| **Error Handling** | HTTP status codes for transport problems (e.g. 406, 421); tool errors as results with `"isError": true` | Tool errors as results with `"isError": true`; JSON-RPC error responses for protocol problems |
 
 ## Troubleshooting stdio Mode
 
 ### Common Issues:
 
-1. **Server doesn't respond**: Check if server is reading from stdin correctly
+1. **Server doesn't respond or exits immediately**: Check stderr (or the log file). If it shows `Failed to ensure Gilhari microservice availability at ...`, start Gilhari or correct `GILHARI_BASE_URL`; the 💡 line after it says what to do
 2. **Broken pipe errors**: Server process may have crashed - check stderr
 3. **JSON parsing errors**: Ensure messages are properly formatted and newline-terminated
 4. **Hanging connections**: Server may be waiting for specific initialization sequence

@@ -3,7 +3,11 @@
 MCP Client - Connect to MCP servers via stdio or HTTP
 # Author: Damodar Periwal
 
-python ormcp_client_example.py --mode http --url http://127.0.0.1:8080 --demo
+Usage examples:
+  python ormcp_client_example.py --mode stdio --demo
+  python ormcp_client_example.py --mode http --url http://127.0.0.1:8080 --demo
+
+Requires: requests, psutil (pip install requests psutil)
 """
 
 import json
@@ -80,7 +84,7 @@ class MCPClient:
                     "id": self._next_id(),
                     "method": "initialize",
                     "params": {
-                        "protocolVersion": "2024-11-05",
+                        "protocolVersion": "2025-06-18",
                         "capabilities": {
                             "roots": {"listChanged": True},
                             "sampling": {}
@@ -118,7 +122,13 @@ class MCPClient:
             return False
     
     def connect_to_running_server(self, pid):
-        """Connect to the already running MCP server by its PID."""
+        """Start a new MCP server with the same command line as the process
+        with the given PID, and connect to it.
+
+        A running stdio server's stdin/stdout belong to the process that
+        started it and cannot be attached to from outside, so this does not
+        connect to that process itself; it starts another server like it.
+        """
         self.connection_type = "stdio"
         try:
             # Find the process by PID
@@ -140,7 +150,7 @@ class MCPClient:
                 "id": self._next_id(),
                 "method": "initialize",
                 "params": {
-                    "protocolVersion": "2024-11-05",
+                    "protocolVersion": "2025-06-18",
                     "capabilities": {
                         "roots": {"listChanged": True},
                         "sampling": {}
@@ -157,11 +167,13 @@ class MCPClient:
                 print(f"✅ Server initialized successfully", flush=True)
                 self.initialized = True
                 
-                # Send initialized notification
+                # Send initialized notification (no response expected)
                 initialized_notification = {
                     "jsonrpc": "2.0",
                     "method": "notifications/initialized"
                 }
+                self.process.stdin.write(json.dumps(initialized_notification) + "\n")
+                self.process.stdin.flush()
                 
             self.initialized = True
             return True
@@ -183,14 +195,11 @@ class MCPClient:
     def connect_http(self, base_url: str) -> bool:
         """Connect to MCP server via HTTP using FastMCP protocol"""
         try:
-            # Ensure URL ends with /mcp/
-            if not base_url.endswith('/mcp/'):
-                if base_url.endswith('/mcp'):
-                    base_url = base_url + '/'
-                elif base_url.endswith('/'):
-                    base_url = base_url + 'mcp/'
-                else:
-                    base_url = base_url + '/mcp/'
+            # Use the /mcp endpoint without a trailing slash: a server built
+            # on FastMCP 3.x answers /mcp/ with a 307 redirect to /mcp.
+            base_url = base_url.rstrip('/')
+            if not base_url.endswith('/mcp'):
+                base_url = base_url + '/mcp'
             
             self.base_url = base_url
             self.connection_type = "http"
@@ -201,7 +210,7 @@ class MCPClient:
                 "id": self._next_id(),
                 "method": "initialize",
                 "params": {
-                    "protocolVersion": "2024-11-05",
+                    "protocolVersion": "2025-06-18",
                     "capabilities": {
                         "roots": {"listChanged": True},
                         "sampling": {}
@@ -416,8 +425,15 @@ class MCPClient:
         })
 
         if response and "result" in response:
-            print(f"✅ Tool result: {json.dumps(response['result'], indent=2)}")
-            return response["result"]
+            result = response["result"]
+            if result.get("isError"):
+                # A failing tool call still returns a result, flagged with
+                # isError; the error message is in the text content.
+                texts = [c.get("text", "") for c in result.get("content", []) if c.get("type") == "text"]
+                print(f"❌ Tool error: {' '.join(texts) or json.dumps(result)}")
+            else:
+                print(f"✅ Tool result: {json.dumps(result, indent=2)}")
+            return result
         else:
             print(f"❌ Tool call failed: {response}")
             return None
@@ -555,15 +571,15 @@ def main():
     # Stdio options
     parser.add_argument(
         "--server_cmd",
-        default="C:\\Users\\dperi\\.local\\bin\\uv.exe run --with fastmcp fastmcp run c:\\Users\\Damodar\\VSCode\\ormcp_server_project\\src\\ormcp_server.py",
-        help="Command to start MCP server for stdio mode"
+        default="ormcp-server",
+        help="Command to start MCP server for stdio mode (default: ormcp-server)"
     )
 
     # MCP server pid options
     parser.add_argument(
         "--server_pid",
         type=int,
-        help="Command to connect to an existing MCP server with the given pid in stdio mode"
+        help="Start a new MCP server with the same command line as the process with this PID (stdio mode)"
     )
 
     # HTTP options

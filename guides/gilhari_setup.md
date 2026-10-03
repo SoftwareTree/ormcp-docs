@@ -19,390 +19,8 @@ Copyright (c) 2025 Software Tree
 - [Compilation and Build](#compilation-and-build)
 - [Additional Examples](#additional-examples)
 - [Troubleshooting](#troubleshooting)
-
-## Troubleshooting
-
-### Common Setup Issues
-
-#### Compilation Errors
-
-**Problem**: `javac: command not found`
-- **Solution**: Install JDK 1.8+ and ensure `javac` is in your PATH
-- **Verify**: Run `javac -version`
-
-**Problem**: `Cannot find symbol: class JDX_JSONObject`
-- **Solution**: Ensure `JX_HOME` environment variable is set correctly
-- **Check**: `echo %JX_HOME%` (Windows) or `echo $JX_HOME` (Linux/Mac)
-- **Verify**: JDX libraries exist at `$JX_HOME/JDXAndroid/libs/`
-
-**Problem**: `package com.softwaretree.jdx does not exist`
-- **Solution**: Verify CLASSPATH includes JDX JAR files in compilation script
-- **Check**: `jdxjson-2.0.jar` and `json-20090211.jar` are in CLASSPATH
-
-#### Docker Build Issues
-
-**Problem**: `ERROR [internal] load metadata for docker.io/softwaretree/gilhari:latest`
-- **Solution**: Pull the base image: `docker pull softwaretree/gilhari`
-- **Alternative**: Check Docker Hub connectivity
-
-**Problem**: `COPY failed: no source files were specified`
-- **Solution**: Ensure `bin/` and `config/` directories exist and contain required files
-- **Check**: Run compilation before building Docker image
-
-**Problem**: Port 80 already in use
-- **Solution**: Change port mapping in `run_docker_app` script
-- **Example**: `-p 8080:8081` instead of `-p 80:8081`
-
-#### Runtime Issues
-
-**Problem**: Container starts but immediately exits
-- **Solution**: Check container logs: `docker logs <container-id>`
-- **Common causes**: 
-  - Missing or incorrect `gilhari_service.config`
-  - Invalid `.jdx` file syntax
-  - Missing JDBC driver
-
-**Problem**: `Database connection failed`
-- **Solution**: Verify database URL in `.jdx` file
-- **For Docker**: Use `host.docker.internal` instead of `localhost` for host databases
-- **Example**: `jdbc:mysql://host.docker.internal:3306/mydb`
-
-**Problem**: `ClassNotFoundException` for container classes
-- **Solution**: Verify `jdx_persistent_classes_location` points to correct directory
-- **Check**: `.class` files exist in `bin/` directory with correct package structure
-
-**Problem**: `JDBC Driver not found`
-- **Solution**: 
-  - Verify JDBC driver path in `gilhari_service.config`
-  - Ensure driver JAR is in `config/` directory
-  - Check that Dockerfile includes: `ADD config ./config`
-
-#### ORM Specification Issues
-
-**Problem**: `Syntax error in .jdx file`
-- **Solution**: Check for:
-  - Missing semicolons (`;`) at end of class definitions
-  - Typos in keywords (CLASS, VIRTUAL_ATTRIB, PRIMARY_KEY, etc.)
-  - Incorrect attribute types
-  - Mismatched class names between `.jdx` and `.java` files
-
-**Problem**: Schema not created or tables missing
-- **Solution**: 
-  - Set `"jdx_force_create_schema": "true"` in config (for development)
-  - Check `jdx_debug_level` (set to 3 to see SQL statements)
-  - Review container logs for SQL errors
-
-**Problem**: Relationship attributes not saved
-- **Solution**: 
-  - Verify RELATIONSHIP specification in `.jdx` file
-  - Check BYVALUE vs BYREFERENCE configuration
-  - Ensure child classes have correct REFERENCE_KEY definitions
-  - For arrays, verify COLLECTION_CLASS is defined
-
-#### REST API Issues
-
-**Problem**: 404 Not Found for API endpoints
-- **Solution**: 
-  - Verify service is running: `docker ps`
-  - Check correct port mapping
-  - Use correct class name in URL (check `classnames_map` file)
-  - Ensure base path is `/gilhari/v1/`
-
-**Problem**: Cannot create objects with relationships
-- **Solution**: 
-  - Include complete nested object structure in POST body
-  - Verify child objects have required primary keys
-  - Check that parent-child linking attributes match (e.g., `aId`)
-
-**Problem**: Path expressions not working
-- **Solution**: 
-  - Use `jdxObject` prefix: `jdxObject.aB.bInt>100`
-  - URL-encode the filter parameter
-  - Use `-G` and `--data-urlencode` with curl
-
-**Problem**: Projections or follow operations failing
-- **Solution**: 
-  - Properly URL-encode `operationDetails` parameter
-  - Use correct JSON array syntax
-  - Set `deep=false` when using selective follow
-  - Verify class and attribute names are correct
-
-### Database-Specific Issues
-
-#### SQLite
-
-**Problem**: Database file not created
-- **Solution**: Ensure path is writable: `./config/mydb.db`
-- **Note**: SQLite creates file automatically if it doesn't exist
-
-**Problem**: Database locked errors
-- **Solution**: 
-  - Only one write operation at a time with SQLite
-  - Consider using PostgreSQL or MySQL for high concurrency
-
-#### MySQL
-
-**Problem**: `Authentication failed`
-- **Solution**: 
-  - Verify username and password in `.jdx` file
-  - Check MySQL user has correct permissions
-  - Ensure MySQL allows remote connections if not on localhost
-
-**Problem**: `Unknown database`
-- **Solution**: Create database first:
-  ```sql
-  CREATE DATABASE mydb;
-  ```
-
-**Problem**: `Public Key Retrieval is not allowed`
-- **Solution**: Add to connection URL: `?allowPublicKeyRetrieval=true&useSSL=false`
-
-#### PostgreSQL
-
-**Problem**: `Connection refused`
-- **Solution**: 
-  - Verify PostgreSQL is running
-  - Check `postgresql.conf` allows connections
-  - Verify `pg_hba.conf` authentication settings
-
-**Problem**: `Password authentication failed`
-- **Solution**: 
-  - Verify username/password in `.jdx` file
-  - Check PostgreSQL user exists: `\du` in psql
-
-### Best Practices
-
-#### Development Environment
-
-1. **Use `jdx_force_create_schema: true`** during development
-   - Automatically recreates schema with each restart
-   - Great for rapid iteration on object model
-   - **Remember**: Set to `false` for production
-
-2. **Set appropriate `jdx_debug_level`**
-   - Level 3: Shows all SQL statements (recommended for development)
-   - Level 5: Minimal logging (production)
-   - Level 0: Maximum verbosity (troubleshooting)
-
-3. **Test with curl scripts**
-   - Create comprehensive test scripts
-   - Include CRUD operations and edge cases
-   - Log responses for verification
-
-4. **Version control**
-   - Include `src/`, `config/`, compilation scripts
-   - Exclude `bin/` directory (generated files)
-   - Include `.gitignore` for generated files and sensitive data
-
-#### Production Deployment
-
-1. **Database considerations**
-   - Use production-grade databases (PostgreSQL, MySQL)
-   - Don't use SQLite for high-concurrency scenarios
-   - Set `jdx_force_create_schema: false`
-   - Configure appropriate connection pooling
-
-2. **Security**
-   - Don't commit database passwords to version control
-   - Use environment variables or secrets management
-   - Restrict database user permissions (principle of least privilege)
-   - Consider using encrypted connections (SSL/TLS)
-
-3. **Performance**
-   - Configure caching in `.jdx` file for frequently accessed data
-   - Use indexes on frequently queried attributes
-   - Monitor database query performance
-   - Consider using projections to limit data transfer
-
-4. **Monitoring**
-   - Set up health check endpoints: `/gilhari/v1/health/check`
-   - Monitor Docker container logs
-   - Track API response times
-   - Monitor database connections
-
-#### Schema Management
-
-1. **Initial development**
-   - Use `jdx_force_create_schema: true`
-   - Iterate quickly on object model
-   - Test with sample data
-
-2. **Schema changes**
-   - For production, consider migration strategies
-   - Back up data before schema changes
-   - Test migrations in staging environment
-
-3. **Multi-environment**
-   - Use different `.jdx` files or configurations per environment
-   - Separate development, staging, and production databases
-   - Document schema versions
-
-### Getting Help
-
-#### Documentation Resources
-
-- **JDX User Manual**: Comprehensive ORM documentation (included in Gilhari SDK)
-- **Gilhari SDK**: Full SDK with examples and libraries from [https://softwaretree.com](https://softwaretree.com)
-- **[Database Configuration Guide](../examples/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations
-- **[operationDetails Documentation](../examples/operationDetails_doc.md)** - Advanced query capabilities
-- **Example Repositories**: Working examples on GitHub
-
-#### Support Channels
-
-- **GitHub Issues**: Report issues in specific example repositories
-- **ORMCP Documentation**: [https://github.com/softwaretree/ormcp-docs](https://github.com/softwaretree/ormcp-docs)
-- **Email Support**: [gilhari_support@softwaretree.com](mailto:gilhari_support@softwaretree.com)
-- **Website**: [https://www.softwaretree.com](https://www.softwaretree.com)
-
----
-
-## Quick Reference
-
-### Essential File Checklist
-
-- [ ] Container domain model classes (.java) in `src/`
-- [ ] Compiled classes (.class) in `bin/`
-- [ ] ORM specification (.jdx) in `config/`
-- [ ] JDBC driver JAR in `config/` (if not using default SQLite)
-- [ ] Service configuration (gilhari_service.config) in root
-- [ ] Dockerfile in root
-- [ ] Compilation script (compile.cmd/.sh)
-- [ ] Build script (build.cmd/.sh)
-- [ ] Run script (run_docker_app.cmd/.sh)
-- [ ] Optional: classnames_map file in `config/`
-- [ ] Optional: curl test scripts
-
-### Common Commands
-
-**Compilation:**
-```bash
-# Windows
-compile.cmd
-
-# Linux/Mac
-./compile.sh
-```
-
-**Build Docker Image:**
-```bash
-# Windows
-build.cmd
-
-# Linux/Mac
-./build.sh
-```
-
-**Run Service:**
-```bash
-# Windows
-run_docker_app.cmd
-
-# Linux/Mac
-./run_docker_app.sh
-```
-
-**Docker Management:**
-```bash
-# List running containers
-docker ps
-
-# View logs
-docker logs <container-id>
-
-# Stop container
-docker stop <container-id>
-
-# Remove container
-docker rm <container-id>
-
-# Shell into container
-docker exec -it <container-id> bash
-```
-
-**API Testing:**
-```bash
-# Health check
-curl -X GET "http://localhost:80/gilhari/v1/health/check"
-
-# Get object model summary
-curl -X GET "http://localhost:80/gilhari/v1/getObjectModelSummary/now"
-
-# Query all objects
-curl -X GET "http://localhost:80/gilhari/v1/User"
-
-# Create object
-curl -X POST "http://localhost:80/gilhari/v1/User" \
-  -H "Content-Type: application/json" \
-  -d '{"entity": {...}}'
-
-# Query with filter
-curl -X GET "http://localhost:80/gilhari/v1/User?filter=age>30"
-
-# Delete with filter
-curl -X DELETE "http://localhost:80/gilhari/v1/User?filter=id=123"
-```
-
-### Key Concepts Summary
-
-**Container Domain Model Classes**
-- Extend `JDX_JSONObject`
-- Require only two constructors
-- Declare relationship attributes as instance variables
-- No getters/setters needed
-
-**ORM Specification (.jdx)**
-- Maps JSON objects to database tables
-- Uses VIRTUAL_ATTRIB for JSON properties
-- Defines relationships with RELATIONSHIP keyword
-- Configures database connection and JDBC driver
-
-**Relationships**
-- BYVALUE: Containment (cascading deletes)
-- BYREFERENCE: Loose coupling
-- One-to-one: Single object reference
-- One-to-many: Array/collection reference
-
-**Service Configuration**
-- Points to .jdx file
-- Specifies JDBC driver location
-- Configures debug level
-- Sets port and other runtime parameters
-
-**Docker Setup**
-- Extends base Gilhari image
-- Adds compiled classes and config
-- Exposes service port
-- Runs Gilhari REST server
-
----
-
-## Conclusion
-
-You now have a complete understanding of setting up Gilhari microservices. The key components are:
-
-1. **Container domain model classes** - Simple Java shell classes
-2. **ORM specification (.jdx)** - Declarative mapping configuration
-3. **Service configuration** - Runtime parameters
-4. **Dockerfile** - Container image definition
-
-With these components properly configured, Gilhari handles all the REST API generation, CRUD operations, and database management automatically.
-
-**Next Steps:**
-- Study the example repositories for working implementations
-- Start with `gilhari_example1` for basic patterns
-- Progress to `gilhari_relationships_example` for relationships
-- Explore other examples for advanced patterns
-- Refer to JDX User Manual for comprehensive ORM features
-
-**Remember:** The examples include pre-compiled classes for immediate use, but you'll need the Gilhari SDK to modify or create your own microservices.
-
----
-
-**Document Version:** 1.0  
-**Last Updated:** 2025  
-**Copyright:** Software Tree  
-
-For the latest documentation and updates, visit [https://www.softwaretree.com](https://www.softwaretree.com)
+- [Quick Reference](#quick-reference)
+- [Conclusion](#conclusion)
 
 ## Overview
 
@@ -420,6 +38,8 @@ Gilhari is a Docker-compatible microservice framework that provides RESTful Obje
 - Declarative ORM specification (.jdx file)
 - Service configuration
 - Docker configuration
+
+> **Tip:** For an existing database, [ORM_Skyway](https://github.com/SoftwareTree/orm_skyway_automation) generates all of these — classes, ORM specification, service configuration and Dockerfile — from the database schema, builds the image, and creates scripts to run it.
 
 ---
 
@@ -853,11 +473,31 @@ From `gilhari_relationships_example/gilhari_service.config`:
 | `gilhari_microservice_name` | Identifies the microservice (logged at startup) | - | Optional but recommended |
 | `jdx_orm_spec_file` | Path to ORM specification (.jdx) file | - | **Required** |
 | `jdbc_driver_path` | Path to JDBC driver JAR file | - | **Required** (default SQLite included) |
-| `jdx_debug_level` | Debug verbosity (0=most, 5=least) | 5 | Level 3 shows all SQL statements |
-| `jdx_force_create_schema` | Recreate schema on each startup | false | Use `true` for development |
+| `jdx_debug_level` | Debug verbosity (0=most, 5=least) | 5 | Level 3 shows all SQL statements; level 0 also logs connection details (passwords masked since JDX 5.29) |
+| `jdx_force_create_schema` | Drop and recreate the mapped tables on each startup | false | Development only: **existing data in the mapped tables is lost**. Refused (with an error) when the database connection is read-only |
 | `jdx_persistent_classes_location` | Root path to compiled .class files | - | **Required** (directory or JAR) |
 | `classnames_map_file` | Optional simplified class name mappings | - | Optional |
 | `gilhari_rest_server_port` | Service port inside container | 8081 | Map to different port with Docker |
+| `db_username` | Database user; overrides `USER` in the ORM specification | - | Optional; see [Database Credentials](#database-credentials) |
+| `db_password` | Database password; overrides `PASSWORD` in the ORM specification | - | Optional; see [Database Credentials](#database-credentials) |
+
+#### Database Credentials
+
+The database user and password can come from three places. The first one that is set (and not empty) wins:
+
+1. The environment variables `JDX_DB_USER` and `JDX_DB_PASSWORD` of the running container (Gilhari 0.8.8+)
+2. `db_username` / `db_password` in `gilhari_service.config`
+3. `USER=` / `PASSWORD=` in the `JDX_DATABASE` line of the ORM specification (`.jdx`)
+
+Files added to a Docker image (the `.jdx` file and `gilhari_service.config`) are part of the image: anyone who can pull the image can read credentials in them. For anything beyond local development, leave them out of these files and pass them when the container starts:
+
+```bash
+docker run -e JDX_DB_USER=myuser -e JDX_DB_PASSWORD=mypassword -p 80:8081 my_service:1.0
+# or keep them in a file that is not committed or added to the image:
+docker run --env-file db_credentials.env -p 80:8081 my_service:1.0
+```
+
+If the credentials are wrong, the service stops at start-up with a one-line message (`JDX ORM initialization failed: ...`) and exit status 1 (Gilhari 0.8.9+).
 
 #### JDBC Driver Location
 
@@ -1373,8 +1013,401 @@ Explore these ready-to-use example repositories:
 
 For AI-powered database interactions using ORMCP Server with Gilhari:
 - **ORMCP Documentation**: [https://github.com/softwaretree/ormcp-docs](https://github.com/softwaretree/ormcp-docs)
-- **ORMCP Examples**: [https://github.com/softwaretree/ormcp-docs#examples](https://github.com/softwaretree/ormcp-docs#examples)
+- **ORMCP Examples**: [https://github.com/SoftwareTree/ormcp-docs/tree/main/examples](https://github.com/SoftwareTree/ormcp-docs/tree/main/examples)
 
 **Note:** All examples include pre-compiled classes for immediate use. Download, build with Docker, and run. The Gilhari SDK is only needed if you want to modify the object models or create your own microservices.
 
 ---
+
+---
+
+## Troubleshooting
+
+### Common Setup Issues
+
+#### Compilation Errors
+
+**Problem**: `javac: command not found`
+- **Solution**: Install JDK 1.8+ and ensure `javac` is in your PATH
+- **Verify**: Run `javac -version`
+
+**Problem**: `Cannot find symbol: class JDX_JSONObject`
+- **Solution**: Ensure `JX_HOME` environment variable is set correctly
+- **Check**: `echo %JX_HOME%` (Windows) or `echo $JX_HOME` (Linux/Mac)
+- **Verify**: JDX libraries exist at `$JX_HOME/JDXAndroid/libs/`
+
+**Problem**: `package com.softwaretree.jdx does not exist`
+- **Solution**: Verify CLASSPATH includes JDX JAR files in compilation script
+- **Check**: `jdxjson-2.0.jar` and `json-20090211.jar` are in CLASSPATH
+
+#### Docker Build Issues
+
+**Problem**: `ERROR [internal] load metadata for docker.io/softwaretree/gilhari:latest`
+- **Solution**: Pull the base image: `docker pull softwaretree/gilhari`
+- **Alternative**: Check Docker Hub connectivity
+
+**Problem**: `COPY failed: no source files were specified`
+- **Solution**: Ensure `bin/` and `config/` directories exist and contain required files
+- **Check**: Run compilation before building Docker image
+
+**Problem**: Port 80 already in use
+- **Solution**: Change port mapping in `run_docker_app` script
+- **Example**: `-p 8080:8081` instead of `-p 80:8081`
+
+#### Runtime Issues
+
+**Problem**: Container starts but immediately exits
+- **Solution**: Check container logs: `docker logs <container-id>`
+- **Common causes**: 
+  - Missing or incorrect `gilhari_service.config`
+  - Invalid `.jdx` file syntax
+  - Missing JDBC driver
+  - Database not reachable or wrong credentials — the log then shows `JDX ORM initialization failed: <reason>` (Gilhari 0.8.9+)
+
+**Problem**: `Database connection failed`
+- **Solution**: Verify database URL in `.jdx` file, and the credentials (see [Database Credentials](#database-credentials))
+- **For Docker**: Use `host.docker.internal` instead of `localhost` for host databases
+- **Example**: `jdbc:mysql://host.docker.internal:3306/mydb`
+
+**Problem**: `ClassNotFoundException` for container classes
+- **Solution**: Verify `jdx_persistent_classes_location` points to correct directory
+- **Check**: `.class` files exist in `bin/` directory with correct package structure
+
+**Problem**: `JDBC Driver not found`
+- **Solution**: 
+  - Verify JDBC driver path in `gilhari_service.config`
+  - Ensure driver JAR is in `config/` directory
+  - Check that Dockerfile includes: `ADD config ./config`
+
+#### ORM Specification Issues
+
+**Problem**: `Syntax error in .jdx file`
+- **Solution**: Check for:
+  - Missing semicolons (`;`) at end of class definitions
+  - Typos in keywords (CLASS, VIRTUAL_ATTRIB, PRIMARY_KEY, etc.)
+  - Incorrect attribute types
+  - Mismatched class names between `.jdx` and `.java` files
+
+**Problem**: Schema not created or tables missing
+- **Solution**: 
+  - Set `"jdx_force_create_schema": "true"` in config (for development)
+  - Check `jdx_debug_level` (set to 3 to see SQL statements)
+  - Review container logs for SQL errors
+
+**Problem**: Relationship attributes not saved
+- **Solution**: 
+  - Verify RELATIONSHIP specification in `.jdx` file
+  - Check BYVALUE vs BYREFERENCE configuration
+  - Ensure child classes have correct REFERENCE_KEY definitions
+  - For arrays, verify COLLECTION_CLASS is defined
+
+#### REST API Issues
+
+**Problem**: 404 Not Found for API endpoints
+- **Solution**: 
+  - Verify service is running: `docker ps`
+  - Check correct port mapping
+  - Use correct class name in URL (check `classnames_map` file)
+  - Ensure base path is `/gilhari/v1/`
+
+**Problem**: Understanding error status codes (Gilhari 0.8.9+)
+- **400**: Invalid request parameter or body (for example `deep=maybe`, `maxObjects=abc`, a missing `entity`, malformed `operationDetails`)
+- **404**: Unsupported API version in the URL (only `v1` exists); also the code for errors raised while executing a read (unknown class, invalid filter, database errors)
+- **500**: Errors raised while executing a write
+- The response body is a plain-text message describing the error
+
+**Problem**: Cannot create objects with relationships
+- **Solution**: 
+  - Include complete nested object structure in POST body
+  - Verify child objects have required primary keys
+  - Check that parent-child linking attributes match (e.g., `aId`)
+
+**Problem**: Path expressions not working
+- **Solution**: 
+  - Use `jdxObject` prefix: `jdxObject.aB.bInt>100`
+  - URL-encode the filter parameter
+  - Use `-G` and `--data-urlencode` with curl
+
+**Problem**: Projections or follow operations failing
+- **Solution**: 
+  - Properly URL-encode `operationDetails` parameter
+  - Use correct JSON array syntax
+  - Set `deep=false` when using selective follow
+  - Verify class and attribute names are correct
+
+### Database-Specific Issues
+
+#### SQLite
+
+**Problem**: Database file not created
+- **Solution**: Ensure path is writable: `./config/mydb.db`
+- **Note**: SQLite creates file automatically if it doesn't exist
+
+**Problem**: Database locked errors
+- **Solution**: 
+  - Only one write operation at a time with SQLite
+  - Consider using PostgreSQL or MySQL for high concurrency
+
+#### MySQL
+
+**Problem**: `Authentication failed`
+- **Solution**: 
+  - Verify username and password — in `.jdx`, `gilhari_service.config` or `JDX_DB_USER`/`JDX_DB_PASSWORD`; see [Database Credentials](#database-credentials) for which one is used
+  - Check MySQL user has correct permissions
+  - Ensure MySQL allows remote connections if not on localhost
+
+**Problem**: `Unknown database`
+- **Solution**: Create database first:
+  ```sql
+  CREATE DATABASE mydb;
+  ```
+
+**Problem**: `Public Key Retrieval is not allowed`
+- **Solution**: Add to connection URL: `?allowPublicKeyRetrieval=true&useSSL=false`
+
+#### PostgreSQL
+
+**Problem**: `Connection refused`
+- **Solution**: 
+  - Verify PostgreSQL is running
+  - Check `postgresql.conf` allows connections
+  - Verify `pg_hba.conf` authentication settings
+
+**Problem**: `Password authentication failed`
+- **Solution**: 
+  - Verify username/password in `.jdx` file
+  - Check PostgreSQL user exists: `\du` in psql
+
+### Best Practices
+
+#### Development Environment
+
+1. **Use `jdx_force_create_schema: true`** during development
+   - Automatically recreates schema with each restart
+   - Great for rapid iteration on object model
+   - **Remember**: Set to `false` for production
+
+2. **Set appropriate `jdx_debug_level`**
+   - Level 3: Shows all SQL statements (recommended for development)
+   - Level 5: Minimal logging (production)
+   - Level 0: Maximum verbosity (troubleshooting); passwords in the logged connection details are masked (JDX 5.29+)
+
+3. **Test with curl scripts**
+   - Create comprehensive test scripts
+   - Include CRUD operations and edge cases
+   - Log responses for verification
+
+4. **Version control**
+   - Include `src/`, `config/`, compilation scripts
+   - Exclude `bin/` directory (generated files)
+   - Include `.gitignore` for generated files and sensitive data
+
+#### Production Deployment
+
+1. **Database considerations**
+   - Use production-grade databases (PostgreSQL, MySQL)
+   - Don't use SQLite for high-concurrency scenarios
+   - Set `jdx_force_create_schema: false`
+   - Configure appropriate connection pooling
+
+2. **Security**
+   - Don't commit database passwords to version control, and don't put them in files added to the image
+   - Pass them at container start with `JDX_DB_USER` / `JDX_DB_PASSWORD` (see [Database Credentials](#database-credentials)), or use secrets management
+   - Restrict database user permissions (principle of least privilege)
+   - Consider using encrypted connections (SSL/TLS)
+
+3. **Performance**
+   - Configure caching in `.jdx` file for frequently accessed data
+   - Use indexes on frequently queried attributes
+   - Monitor database query performance
+   - Consider using projections to limit data transfer
+
+4. **Monitoring**
+   - Set up health check endpoints: `/gilhari/v1/health/check` (it reports whether the service is running; it does not query the database)
+   - Monitor Docker container logs
+   - Track API response times
+   - Monitor database connections
+
+#### Schema Management
+
+1. **Initial development**
+   - Use `jdx_force_create_schema: true`
+   - Iterate quickly on object model
+   - Test with sample data
+
+2. **Schema changes**
+   - For production, consider migration strategies
+   - Back up data before schema changes
+   - Test migrations in staging environment
+
+3. **Multi-environment**
+   - Use different `.jdx` files or configurations per environment
+   - Separate development, staging, and production databases
+   - Document schema versions
+
+### Getting Help
+
+#### Documentation Resources
+
+- **JDX User Manual**: Comprehensive ORM documentation (included in Gilhari SDK)
+- **Gilhari SDK**: Full SDK with examples and libraries from [https://softwaretree.com](https://softwaretree.com)
+- **[Database Configuration Guide](../examples/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations
+- **[operationDetails Documentation](../examples/operationDetails_doc.md)** - Advanced query capabilities
+- **Example Repositories**: Working examples on GitHub
+
+#### Support Channels
+
+- **GitHub Issues**: Report issues in specific example repositories
+- **ORMCP Documentation**: [https://github.com/softwaretree/ormcp-docs](https://github.com/softwaretree/ormcp-docs)
+- **Email Support**: [gilhari_support@softwaretree.com](mailto:gilhari_support@softwaretree.com)
+- **Website**: [https://www.softwaretree.com](https://www.softwaretree.com)
+
+---
+
+## Quick Reference
+
+### Essential File Checklist
+
+- [ ] Container domain model classes (.java) in `src/`
+- [ ] Compiled classes (.class) in `bin/`
+- [ ] ORM specification (.jdx) in `config/`
+- [ ] JDBC driver JAR in `config/` (if not using default SQLite)
+- [ ] Service configuration (gilhari_service.config) in root
+- [ ] Dockerfile in root
+- [ ] Compilation script (compile.cmd/.sh)
+- [ ] Build script (build.cmd/.sh)
+- [ ] Run script (run_docker_app.cmd/.sh)
+- [ ] Optional: classnames_map file in `config/`
+- [ ] Optional: curl test scripts
+
+### Common Commands
+
+**Compilation:**
+```bash
+# Windows
+compile.cmd
+
+# Linux/Mac
+./compile.sh
+```
+
+**Build Docker Image:**
+```bash
+# Windows
+build.cmd
+
+# Linux/Mac
+./build.sh
+```
+
+**Run Service:**
+```bash
+# Windows
+run_docker_app.cmd
+
+# Linux/Mac
+./run_docker_app.sh
+```
+
+**Docker Management:**
+```bash
+# List running containers
+docker ps
+
+# View logs
+docker logs <container-id>
+
+# Stop container
+docker stop <container-id>
+
+# Remove container
+docker rm <container-id>
+
+# Shell into container
+docker exec -it <container-id> bash
+```
+
+**API Testing:**
+```bash
+# Health check
+curl -X GET "http://localhost:80/gilhari/v1/health/check"
+
+# Get object model summary
+curl -X GET "http://localhost:80/gilhari/v1/getObjectModelSummary/now"
+
+# Query all objects
+curl -X GET "http://localhost:80/gilhari/v1/User"
+
+# Create object
+curl -X POST "http://localhost:80/gilhari/v1/User" \
+  -H "Content-Type: application/json" \
+  -d '{"entity": {...}}'
+
+# Query with filter
+curl -X GET "http://localhost:80/gilhari/v1/User?filter=age>30"
+
+# Delete with filter
+curl -X DELETE "http://localhost:80/gilhari/v1/User?filter=id=123"
+```
+
+### Key Concepts Summary
+
+**Container Domain Model Classes**
+- Extend `JDX_JSONObject`
+- Require only two constructors
+- Declare relationship attributes as instance variables
+- No getters/setters needed
+
+**ORM Specification (.jdx)**
+- Maps JSON objects to database tables
+- Uses VIRTUAL_ATTRIB for JSON properties
+- Defines relationships with RELATIONSHIP keyword
+- Configures database connection and JDBC driver
+
+**Relationships**
+- BYVALUE: Containment (cascading deletes)
+- BYREFERENCE: Loose coupling
+- One-to-one: Single object reference
+- One-to-many: Array/collection reference
+
+**Service Configuration**
+- Points to .jdx file
+- Specifies JDBC driver location
+- Configures debug level
+- Sets port and other runtime parameters
+
+**Docker Setup**
+- Extends base Gilhari image
+- Adds compiled classes and config
+- Exposes service port
+- Runs Gilhari REST server
+
+---
+
+## Conclusion
+
+You now have a complete understanding of setting up Gilhari microservices. The key components are:
+
+1. **Container domain model classes** - Simple Java shell classes
+2. **ORM specification (.jdx)** - Declarative mapping configuration
+3. **Service configuration** - Runtime parameters
+4. **Dockerfile** - Container image definition
+
+With these components properly configured, Gilhari handles all the REST API generation, CRUD operations, and database management automatically.
+
+**Next Steps:**
+- Study the example repositories for working implementations
+- Start with `gilhari_example1` for basic patterns
+- Progress to `gilhari_relationships_example` for relationships
+- Explore other examples for advanced patterns
+- Refer to JDX User Manual for comprehensive ORM features
+
+**Remember:** The examples include pre-compiled classes for immediate use, but you'll need the Gilhari SDK to modify or create your own microservices.
+
+---
+
+**Document Version:** 1.1  
+**Last Updated:** 2026-10-02 (Gilhari 0.8.9, JDX 5.29)  
+**Copyright:** Software Tree  
+
+For the latest documentation and updates, visit [https://www.softwaretree.com](https://www.softwaretree.com)

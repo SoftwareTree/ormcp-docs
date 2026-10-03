@@ -2,7 +2,7 @@ Copyright (c) 2025, Software Tree
 
 # ORMCP Server - Beta
 
-_Last updated: 2026-09-15 7:06 PM PDT_
+_Last updated: 2026-10-02 (ORMCP 0.7.0)_
 
 *A Model Context Protocol (MCP) Server to connect your AI applications to relational databases*
 
@@ -575,17 +575,23 @@ Configure via environment variables:
 | `MCP_SERVER_NAME` | Server identifier | `ORMCPServerDemo` | `MyCompanyORMCP` |
 | `GILHARI_TIMEOUT` | API timeout (seconds) | `30` | `60` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` | `DEBUG`, `WARNING`, `ERROR` |
+| `ORMCP_LOG_FILE` | Log file, in addition to the console; `none` (or `off`) for console only | `ormcp_server_debug.log` in the system's temp directory | `C:\Logs\ormcp.log`, `none` |
 | `READONLY_MODE` | Expose only read operations | `True` | `False` |
-| `GILHARI_NAME` | Name of the app-specific Gilhari microservice | "" | `my-gilhari-microservice` |
+| `GILHARI_NAME` | Name of the app-specific Gilhari microservice | `my-gilhari-microservice` | `sakila-service` |
 | `GILHARI_IMAGE` | Docker image name of the app-specific Gilhari microservice | "" | `gilhari_example1:1.0` |
-| `GILHARI_HOST` | IP address of the host machine for Gilhari microservice | `localhost` | `10.20.30.40` |
-| `GILHARI_PORT` | Port number to contact the Gilhari microservice | `80` | `8888` |
+| `GILHARI_HOST` | Host for the start-up availability check, if different from `GILHARI_BASE_URL`'s (rarely needed) | host in `GILHARI_BASE_URL` | `10.20.30.40` |
+| `GILHARI_PORT` | Port for the start-up availability check (and for a container ORMCP starts), if different from `GILHARI_BASE_URL`'s (rarely needed) | port in `GILHARI_BASE_URL` | `8888` |
+| `HOST_ORIGIN_PROTECTION` | HTTP mode: reject requests whose `Host`/`Origin` header is not trusted (DNS-rebinding protection) | `true` | `false` |
+| `ALLOWED_HOSTS` | HTTP mode: comma-separated host names to trust in addition to the defaults | none | `host.docker.internal,ormcp.internal` |
+| `ALLOWED_ORIGINS` | HTTP mode: comma-separated origins to trust | none | `https://app.example.com` |
 
 **Notes:**
 
 * `READONLY_MODE` defaults to `True`: the MCP tools that can potentially modify data (`insert`, `update`, `update2`, `delete`, `delete2`) are **not** exposed by the **ORMCP server** to the MCP client unless you explicitly set `READONLY_MODE=False`.
-* `GILHARI_BASE_URL` and `GILHARI_NAME` are used to probe an already running Gilhari microservice container
-* `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` are used to run a new instance of Gilhari microservice if an existing microservice is not found. Please make sure that the values of `GILHARI_HOST` and `GILHARI_PORT` variables match the corresponding values in `GILHARI_BASE_URL` setting because that is where the **ORMCP server** will contact the Gilhari microservice.
+* At start-up, ORMCP checks that the Gilhari microservice answers at `GILHARI_BASE_URL` — the same address it then sends all its requests to. Since ORMCP 0.7.0, the host and port for this check come from `GILHARI_BASE_URL`, so `GILHARI_BASE_URL` alone is enough; `GILHARI_HOST` and `GILHARI_PORT` only override it, and ORMCP warns if they differ from `GILHARI_BASE_URL`.
+* If no microservice answers, ORMCP can start one itself: set `GILHARI_IMAGE` (and optionally `GILHARI_NAME`); the container's host port is the port in `GILHARI_BASE_URL` (or `GILHARI_PORT`). If the check still fails, ORMCP stops with a message naming the address it checked and what to do next.
+* `ORMCP_LOG_FILE`: the file rotates at 5 MB, keeping two older copies. If it cannot be written, ORMCP logs a warning and continues with console logging. In a Windows shell, `set ORMCP_LOG_FILE=` removes the variable (default file); use `none` to turn file logging off.
+* `HOST_ORIGIN_PROTECTION` accepts `true`/`1`/`yes`/`on`/`strict` and `false`/`0`/`no`/`off`; any other value, including `auto`, keeps the protection on and logs a warning. `ALLOWED_HOSTS`/`ALLOWED_ORIGINS` apply only while the protection is on.
 
 ### Configuration Example
 
@@ -752,10 +758,17 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 ### Expected Output
 
 ```
-[INFO] ORMCP server name: ORMCPServerDemo
-[INFO] GILHARI BASE URL: http://localhost:80/gilhari/v1/
-[INFO] ORMCP server v0.5.x starting in stdio (or http) mode ...
+... - microservice_ensure - INFO - Checking the Gilhari microservice at http://localhost:80/gilhari/v1/health/check
+... - microservice_ensure - INFO - Health endpoint check passed for my-gilhari-microservice
+... - INFO - Gilhari microservice is available
+... - INFO - ORMCP server name: ORMCPServerDemo
+... - INFO - GILHARI BASE URL: http://localhost:80/gilhari/v1/
+🟢 This ORMCP server is configured to expose just the READONLY MCP tools
+... - INFO - Log file: <temp directory>/ormcp_server_debug.log
+🟢 ORMCP server v0.7.0 starting in stdio (or HTTP) mode ...
 ```
+
+If no Gilhari microservice answers at `GILHARI_BASE_URL`, ORMCP stops with a message naming the address it checked, followed by a 💡 "What to do" hint.
 
 ### Containerized Deployment (MCP Registries)
 
@@ -863,32 +876,23 @@ pip show -f ormcp-server | grep "ormcp-server$"     # Linux/Mac
 }
 ```
 
-#### Option 5: HTTP Mode
+#### Option 5: HTTP Mode (Custom Connector)
 
-```
-{
-  "mcpServers": {
-    "my-ormcp-server-http": {
-      "command": "ormcp-server",
-      "args": [
-        "--transport", "http",
-        "--port", "8080"
-      ],
-      "env": {
-        "GILHARI_BASE_URL": "http://localhost:80/gilhari/v1/",
-        "MCP_SERVER_NAME": "MyORMCPServer"
-      }
-    }
-  }
-}
-```
+`claude_desktop_config.json` starts local MCP servers over **stdio** only (Options 1–4); a server started from it with `--transport http` won't connect. Claude Desktop reaches an MCP server over HTTP only as a **custom connector**:
+
+1. Start ORMCP in HTTP mode: `ormcp-server --transport http --port 8080`
+2. Make it reachable at a **public HTTPS URL**, e.g. with `cloudflared` or `ngrok` as described for [OpenAI GPTs](#openai-gpts-developer-mode). Custom connectors are connected from Anthropic's cloud, not from your computer, so `localhost` URLs don't work.
+3. Allow the tunnel's host name, otherwise ORMCP's Host/Origin protection rejects the requests (HTTP 421): e.g. `ALLOWED_HOSTS=<your-tunnel-host>`.
+4. In Claude Desktop: **Settings → Connectors → Add custom connector**, and enter the public URL followed by `/mcp`, e.g. `https://<your-tunnel-host>/mcp`.
+
+Custom connectors are available on all Claude plans (the Free plan is limited to one); on Team and Enterprise plans an administrator may need to allow them.
 
 **Notes:**
 
 * `ORMCPServerDemo` is the default name of the ORMCP server.
 * Replace `<YourUsername>` with your actual Windows username
 * If you are providing a port number of the associated Gilhari microservice through the "GILHARI\_BASE\_URL" environment variable, make sure that is the port where that Gilhari microservice is listening.
-* *Note: As of July 20, 2025, Claude desktop did not support connecting to an MCP server running in http mode.*
+* Claude Desktop connects to an HTTP-mode ORMCP server only as a custom connector at a public HTTPS URL (Option 5); for a local server, use stdio (Options 1–4).
 
 ### Gemini CLI
 
@@ -976,7 +980,11 @@ ORMCP Server provides the following MCP tools for interacting with your database
 
 **📖 Detailed API Documentation:** For complete parameter specifications and technical details, see the [MCP Tools API Reference](https://github.com/softwaretree/ormcp-docs/blob/main/reference/ormcp_tools_reference.md).
 
-**💡 Working Examples:** See real-world usage examples in the [examples directory](/SoftwareTree/ormcp-docs/blob/main/examples).
+**💡 Working Examples:** See real-world usage examples in the [examples directory](https://github.com/SoftwareTree/ormcp-docs/blob/main/examples).
+
+**Attribute names, not column names:** filters, projections and aggregates use the attribute names shown by `getObjectModelSummary`. Where a database column name contains characters other than letters, digits and `_`, the attribute name replaces them with `_` — e.g. the column `All_Traffic.action` is the attribute `All_Traffic_action`.
+
+**Classes without a unique primary key:** a class marked `DB_PRIMARY_KEY_EXISTS FALSE` in the object model summary may have several objects with the same key values. Use `query`, `access`, `getAggregate`, and `update2`/`delete2` with a filter for it; `getObjectById`, `update` and `delete` are not supported.
 
 ### Core Operations
 
@@ -1001,6 +1009,11 @@ Query objects with filtering and relationship traversal.
   + `ignore` or `follow`: Control referenced object branches
   + `filter`: Apply filters to referenced objects
 
+  Projections must include the class's primary-key attributes, except for classes marked `DB_PRIMARY_KEY_EXISTS FALSE`.
+* `allowDuplicates` (boolean, optional): Return every qualifying row as its own object, even when rows have identical primary key values (default: false; requires Gilhari 0.8.7+)
+
+**Returns:** A JSON array of the qualifying objects (`[]` if none qualify)
+
 #### `getObjectById`
 
 Retrieve a specific object by its primary key.
@@ -1011,6 +1024,8 @@ Retrieve a specific object by its primary key.
 * `primaryKey` (object): Primary key values (single value or composite key object)
 * `deep` (boolean, optional): Include referenced objects (default: true)
 * `operationDetails` (string, optional): Operational directives for fine-tuning queries
+
+**Returns:** The object as a single JSON object, or `null` if no object has that id
 
 #### `access`
 
@@ -1024,6 +1039,8 @@ Retrieve object(s) referenced by a specific attribute of a referencing object.
 * `deep` (boolean, optional): Include referenced objects of retrieved objects as well (default: true)
 * `operationDetails` (string, optional): Operational directives for fine-tuning queries
 
+**Returns:** For a collection attribute, a JSON array of the referenced objects (`[]` if none); otherwise the referenced object
+
 #### `getAggregate`
 
 Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
@@ -1034,6 +1051,8 @@ Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
 * `attributeName` (string): Attribute to perform aggregation on
 * `aggregateType` (string): Type of aggregation - `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`
 * `filter` (string, optional): SQL-like WHERE clause to filter objects before aggregation
+
+**Returns:** A single JSON value (e.g. `1000` for COUNT), not a list of objects
 
 ### Data Modification Operations
 
@@ -1049,15 +1068,19 @@ Save one or more JSON objects to the database.
 * `jsonObjects` (array): List of JSON objects to save to the database
 * `deep` (boolean, optional): Save referenced objects as well (default: true)
 
+**Returns:** A short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors
+
 #### `update`
 
-Update one or more existing objects with new values.
+Update one or more existing objects with new values. `update` replaces each stored object with the one given (matched by primary key), so include all of its attributes. To change only some attributes, use `update2` with a filter on the primary key.
 
 **Parameters:**
 
 * `className` (string): Type of objects to update
-* `jsonObjects` (array): List of objects with updated values (must include primary keys)
+* `jsonObjects` (array): List of complete objects with updated values (each with its primary key and all other attributes)
 * `deep` (boolean, optional): Update referenced objects as well (default: true)
+
+**Returns:** A short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors
 
 #### `update2`
 
@@ -1067,8 +1090,10 @@ Bulk update objects matching filter criteria.
 
 * `className` (string): Type of objects to update
 * `filter` (string): SQL-like WHERE clause to identify objects to update
-* `newValues` (array): List of attribute names and their new values
+* `newValues` (array): Alternating list of attribute names and their new values, e.g. `["status", "active", "age", 40]`
 * `deep` (boolean, optional): Update referenced objects as well (default: true)
+
+**Returns:** The number of top-level objects updated
 
 #### `delete`
 
@@ -1080,6 +1105,8 @@ Delete specific objects from the database.
 * `jsonObjects` (array): Objects to delete (primary keys required for identification)
 * `deep` (boolean, optional): Delete referenced objects as well (default: true)
 
+**Returns:** A short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors
+
 #### `delete2`
 
 Bulk delete objects matching filter criteria.
@@ -1089,6 +1116,8 @@ Bulk delete objects matching filter criteria.
 * `className` (string): Type of objects to delete
 * `filter` (string, optional): SQL-like WHERE clause to identify objects to delete (empty string deletes all objects of the specified class)
 * `deep` (boolean, optional): Delete referenced objects as well (default: true)
+
+**Returns:** The number of top-level objects deleted
 
 **Note:** `READONLY_MODE` defaults to `True`, so the MCP tools for data modification operations (`insert`, `update`, `update2`, `delete`, `delete2`) are **not** exposed to MCP clients unless you explicitly set `READONLY_MODE=False`.
 
@@ -1113,7 +1142,8 @@ For common issues and solutions, see the [Complete Troubleshooting Guide](https:
 
 **Runtime Issues:**
 
-* Server won't start → Check Gilhari is running
+* Server won't start → Check that Gilhari is running and that `GILHARI_BASE_URL` has its port (`docker ps` shows a container's host port, e.g. `0.0.0.0:8130->8081/tcp` means 8130); the error message names the address ORMCP checked
+* Details of a run → see the log file (`ormcp_server_debug.log` in the system's temp directory, or `ORMCP_LOG_FILE`)
 * Database connection errors → Verify JDBC driver in Gilhari
 * MCP client connection issues → Check config file syntax
 
@@ -1167,7 +1197,7 @@ pytest
 * You may be able to reverse-engineer ORM specification from an existing database schema using tools/examples provided with Gilhari SDK. Check the `examples\JDX_ReverseEngineeringJSONExample` directory.
 * The reverse-engineering example is also available online at [github.com/SoftwareTree/JDX\_ReverseEngineeringJSONExample](https://github.com/SoftwareTree/JDX_ReverseEngineeringJSONExample)
 * For details on creating custom Gilhari microservices, refer to the Gilhari SDK documentation included in the source distribution package.
-* Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI\_BASE\_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls.
+* Although an ORMCP server may start a Gilhari microservice if configured to do so (using `GILHARI_IMAGE`, `GILHARI_NAME`, and `GILHARI_PORT` environment variables), it is recommended that you start your custom Gilhari microservice before using the ORMCP server. Also, please make sure that the port number in the 'GILHARI\_BASE\_URL' environment variable for the ORMCP server matches the port number on which the custom Gilhari microservice is listening for incoming REST calls; ORMCP checks that address at start-up.
 
 ## Contributing
 
@@ -1209,7 +1239,7 @@ ORMCP Server uses the following open-source Python libraries, each governed by t
 
 ## License
 
-ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICENSE](/SoftwareTree/ormcp-docs/blob/main/LICENSE) file for complete terms.
+ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICENSE](https://github.com/SoftwareTree/ormcp-docs/blob/main/LICENSE) file for complete terms.
 
 **Beta Evaluation:** ORMCP Server is currently available as a beta product under an evaluation license. This allows free use for testing and evaluation purposes for a limited evaluation period (30 days from the date of installation).
 
@@ -1221,7 +1251,7 @@ ORMCP Server is proprietary software owned by Software Tree, LLC. See the [LICEN
 
 * **Documentation**: [Complete documentation and guides](https://github.com/softwaretree/ormcp-docs)
 * **Platform Guides**: [macOS](./guides/getting-started-mac.md) · [Windows](./guides/getting-started-windows.md) · [Linux](./guides/getting-started-linux.md)
-* **Working Examples**: [Browse Examples](/SoftwareTree/ormcp-docs/blob/main/examples) | [Examples Guide](/SoftwareTree/ormcp-docs/blob/main/examples/README.md) - Real-world use cases and integrations
+* **Working Examples**: [Browse Examples](https://github.com/SoftwareTree/ormcp-docs/blob/main/examples) | [Examples Guide](https://github.com/SoftwareTree/ormcp-docs/blob/main/examples/README.md) - Real-world use cases and integrations
 * **Example Microservice**: [gilhari\_example1 Repository](https://github.com/SoftwareTree/gilhari_example1)
 * **Bug Reports**: [Report issues](https://github.com/softwaretree/ormcp-docs/issues)
 * **Email Support**: [ormcp\_support@softwaretree.com](mailto:ormcp_support@softwaretree.com)

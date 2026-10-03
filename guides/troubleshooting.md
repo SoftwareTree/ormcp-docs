@@ -429,7 +429,14 @@ pip install --upgrade certifi
 
 ### Gilhari Connection Refused
 
-**Problem:** ORMCP can't connect to Gilhari microservice
+**Problem:** ORMCP can't connect to Gilhari microservice. At start-up it stops with:
+
+```
+❌ Failed to ensure Gilhari microservice availability at 'http://localhost:80/gilhari/v1/' (probed http://localhost:80/gilhari/v1/health/check) -- ORMCP server cannot start.
+💡 What to do: ...
+```
+
+The `probed` address is where ORMCP looked. Since ORMCP 0.7.0 it is taken from `GILHARI_BASE_URL`, unless `GILHARI_HOST`/`GILHARI_PORT` override it (ORMCP warns if they differ from `GILHARI_BASE_URL`).
 
 **Diagnosis:**
 
@@ -518,13 +525,14 @@ docker logs -f <container-id>
 
 **Common Issues:**
 
-**1. Wrong Database URL:**
-```dockerfile
-# Check Dockerfile environment variables
-ENV DB_URL=jdbc:postgresql://correct-host:5432/mydb
-ENV DB_USER=correct_user
-ENV DB_PASSWORD=correct_password
+**1. Wrong Database URL or Credentials:**
+
+The database URL is in the `JDX_DATABASE` line of the ORM specification (`.jdx`) packaged into the Gilhari image:
 ```
+JDX_DATABASE JDX:jdbc:postgresql://correct-host:5432/mydb;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=POSTGRES;DEBUG_LEVEL=5
+```
+
+The user and password can also come from `db_username`/`db_password` in `gilhari_service.config`, or from the environment variables `JDX_DB_USER`/`JDX_DB_PASSWORD`, which take precedence. Pass those at container start (`docker run -e JDX_DB_USER=... -e JDX_DB_PASSWORD=...`), not with `ENV` in the Dockerfile, which would build them into the image. With wrong credentials, Gilhari 0.8.9+ stops at start-up with `JDX ORM initialization failed: <reason>` in `docker logs`.
 
 **2. Database Not Accessible:**
 
@@ -601,11 +609,17 @@ which ormcp-server
 "command": "C:\\Users\\YourUser\\AppData\\Roaming\\Python\\Python313\\Scripts\\ormcp-server.exe"
 ```
 
-**4. Check Logs:**
+**4. HTTP mode and Claude Desktop:**
+
+`claude_desktop_config.json` starts local MCP servers over **stdio** only, so keep `"args": []` (or `--transport stdio`) there; a server started from it with `--transport http` won't connect. Claude Desktop reaches HTTP servers only as **custom connectors** (**Settings → Connectors → Add custom connector**). Those connections are made from Anthropic's cloud, not from your computer, so ORMCP must be reachable at a public HTTPS URL, e.g. through a tunnel as described for [OpenAI GPTs](../README.md#openai-gpts-developer-mode), and the tunnel's host name must be allowed (see [HTTP Mode: 421 Misdirected Request](#http-mode-421-misdirected-request)).
+
+**5. Check Logs:**
 
 **Claude Desktop Logs:**
 - **macOS:** `~/Library/Logs/Claude/`
 - **Windows:** `%APPDATA%\Claude\logs\`
+
+**ORMCP's own log file:** `ormcp_server_debug.log` in the system's temp directory — `%TEMP%` on Windows, `$TMPDIR` on macOS, usually `/tmp` on Linux — or the file set with `ORMCP_LOG_FILE`.
 
 **Look for:**
 - Server startup errors
@@ -724,6 +738,7 @@ Add to config file (variables set per-server):
 docker ps
 
 # Should show: 0.0.0.0:80->8081/tcp
+# The number before "->" is the host port; GILHARI_BASE_URL must use it.
 
 # If different port:
 docker run -p 8888:8081 gilhari_example1:1.0
@@ -731,6 +746,8 @@ docker run -p 8888:8081 gilhari_example1:1.0
 # Update environment variable
 export GILHARI_BASE_URL="http://localhost:8888/gilhari/v1/"
 ```
+
+`GILHARI_PORT` is not needed for this: since ORMCP 0.7.0 the port comes from `GILHARI_BASE_URL`. If `GILHARI_PORT` is set to a different port, ORMCP logs a warning at start-up, because its check would then probe another port than the one it sends requests to; remove it or make it match.
 
 ---
 
@@ -1075,6 +1092,8 @@ ormcp-server
 # - Environment variable values
 ```
 
+Everything logged to the console also goes to ORMCP's log file, `ormcp_server_debug.log` in the system's temp directory (`%TEMP%` on Windows, `$TMPDIR` on macOS, usually `/tmp` on Linux). Set `ORMCP_LOG_FILE` to use another file, or to `none` to log to the console only. The file rotates at 5 MB.
+
 ### Gilhari Debug Mode
 
 In your Dockerfile:
@@ -1128,7 +1147,7 @@ python --version
 **2. Error Messages:**
 - Complete error text
 - Stack traces
-- Log files
+- Log files (ORMCP's `ormcp_server_debug.log`, see [ORMCP Debug Mode](#ormcp-debug-mode); and `docker logs <gilhari-container>`)
 
 **3. Configuration:**
 - Environment variables (sanitize sensitive data)
@@ -1160,7 +1179,9 @@ python --version
 
 ## Common Error Messages
 
-### "Gilhari service not responding"
+### "Failed to ensure Gilhari microservice availability"
+
+ORMCP stops at start-up with this message when no Gilhari microservice answers at the `probed` address it names.
 
 **Causes:**
 - Gilhari not running

@@ -56,11 +56,13 @@ pip install ormcp-server
 pip show ormcp-server
 
 # Verify command works
-ormcp-server --help
+ormcp-server --version
 
 # Expected output:
-# ORMCP Server v0.6.x
-# Usage: ormcp-server [OPTIONS]
+# ORMCP Server v0.7.0
+
+# Show the command-line options
+ormcp-server --help
 ```
 
 ---

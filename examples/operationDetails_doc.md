@@ -33,7 +33,12 @@ Specify which attributes to include for particular object types (similar to Grap
 }
 ```
 
-**Example:** Only retrieve `name`, `id`, and `email` from Employee objects:
+**Rules:**
+- The projected attributes of a class must include all of its primary-key attributes, as shown by `getObjectModelSummary`. Exception: a class marked `DB_PRIMARY_KEY_EXISTS FALSE` has no real primary key, so its projections need not include the key attributes.
+- `projections` are supported by `query` and `access`, but not by `getObjectById`.
+- Use attribute names from the object model summary, not database column names.
+
+**Example:** Only retrieve `name`, `id`, and `email` from Employee objects (`id` being the primary key):
 ```json
 [{
   "opType": "projections", 
@@ -97,6 +102,8 @@ Filter objects of specific types using predicate expressions.
   ]
 }
 ```
+
+Predicates use attribute names from the object model summary, not database column names.
 
 **Example:** Only include active employees with salary > 50000:
 ```json

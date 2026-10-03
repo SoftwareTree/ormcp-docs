@@ -2,7 +2,7 @@ Copyright (c) 2025 Software Tree
 
 # JDX_DATABASE and JDBC_DRIVER Configuration in the ORM specification (.jdx) file
 
-This guide provides examples of how to specify the `JDX_DATABASE` and `JDBC_DRIVER` statements in the Object Relationa Mapping (ORM) specification `.jdx` file for different types of databases. Please make sure to substitute the placeholders (e.g., `<DatabaseName>`, `<UserName>`, etc.) with your actual database configurations.
+This guide provides examples of how to specify the `JDX_DATABASE` and `JDBC_DRIVER` statements in the Object Relational Mapping (ORM) specification `.jdx` file for different types of databases. Please make sure to substitute the placeholders (e.g., `<DatabaseName>`, `<UserName>`, etc.) with your actual database configurations.
 
 These specifications go at the top of the mapping file before declaring the ORM specifications for the domain model object classes.
 
@@ -62,9 +62,9 @@ For databases hosted in the cloud, use the following format:
 <DatabaseServer_Cloud_IP_Address>:<PortNumber>
 ```
 
-### Windows 10: Get IP Address for Local Database
+### Windows: Get IP Address for Local Database
 
-To get the IP address of your machine in Windows 10:
+To get the IP address of your machine in Windows:
 
 1. Open Command Prompt and run: `ipconfig /all`
 2. Look for the IPv4 Address under the Ethernet adapter (e.g., `174.18.38.81`).
@@ -96,10 +96,10 @@ JDBC_DRIVER org.sqlite.JDBC
 JDX_DATABASE JDX:jdbc:mysql://localhost:3306/<DatabaseName>?useSSL=false;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=MYSQL;DEBUG_LEVEL=5
 
 // MySQL (To access from within a Docker Container)
-JDX_DATABASE JDX:jdbc:mysql://host.docker.internal:3306/JDXTestDB?useSSL=false;USER=dperiwal;PASSWORD=secretOne;JDX_DBTYPE=MYSQL;DEBUG_LEVEL=5
+JDX_DATABASE JDX:jdbc:mysql://host.docker.internal:3306/<DatabaseName>?useSSL=false;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=MYSQL;DEBUG_LEVEL=5
 
 // MySQL (Local or Remote Server)
-JDX_DATABASE JDX:jdbc:mysql://<MySQL_IP_Address>:3306/JDXTestDB?useSSL=false;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=MYSQL;DEBUG_LEVEL=5
+JDX_DATABASE JDX:jdbc:mysql://<MySQL_IP_Address>:3306/<DatabaseName>?useSSL=false;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=MYSQL;DEBUG_LEVEL=5
 
 // MySQL JDBC Driver
 JDBC_DRIVER com.mysql.cj.jdbc.Driver
@@ -119,8 +119,8 @@ JDX_DATABASE JDX:jdbc:postgresql://host.docker.internal:5432/<DatabaseName>;USER
 // PostgreSQL (Local or Remote Server)
 JDX_DATABASE JDX:jdbc:postgresql://<Postgresql_IP_Address>:5432/<DatabaseName>;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=POSTGRES;DEBUG_LEVEL=5
 
-// PostgreSQL (Cloud Example: Supabase)
-JDX_DATABASE JDX:jdbc:postgresql://db.lxbznecvjwlzdtpckxyz.supabase.co:5432/postgres?user=postgres&password=DPSupaPost_SQL;JDX_DBTYPE=POSTGRES;DEBUG_LEVEL=5
+// PostgreSQL (Cloud Example: Supabase; credentials as URL parameters)
+JDX_DATABASE JDX:jdbc:postgresql://db.<project-ref>.supabase.co:5432/postgres?user=<UserName>&password=<Password>;JDX_DBTYPE=POSTGRES;DEBUG_LEVEL=5
 
 // PostgreSQL JDBC Driver
 JDBC_DRIVER org.postgresql.Driver
@@ -155,7 +155,7 @@ In the URL below, `hostname` refers to the name or IP address of the machine whe
 JDX_DATABASE JDX:jdbc:oracle:thin:@<hostname>:<port>:<sid>;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=Oracle;DEBUG_LEVEL=5
 
 // Oracle (To access from within a Docker Container)
-JDX_DATABASE JDX:jdbc:oracle:thin://host.docker.internal:<port>:<sid>;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=Oracle;DEBUG_LEVEL=5
+JDX_DATABASE JDX:jdbc:oracle:thin:@host.docker.internal:<port>:<sid>;USER=<UserName>;PASSWORD=<Password>;JDX_DBTYPE=Oracle;DEBUG_LEVEL=5
 
 // Oracle JDBC Driver
 JDBC_DRIVER oracle.jdbc.driver.OracleDriver
@@ -167,6 +167,8 @@ JDBC_DRIVER oracle.jdbc.driver.OracleDriver
 
 * Ensure the correct JDBC driver is added to the classpath for your database type.
 * Always verify that the database connection details (username, password, database name, IP address, port) are correctly specified.
+* **Credentials in Docker images:** the `.jdx` file is added to the Gilhari Docker image, so `USER`/`PASSWORD` in it can be read by anyone who can pull the image. Gilhari can take them from the environment variables `JDX_DB_USER`/`JDX_DB_PASSWORD` at container start instead, which take precedence over the `.jdx` values — see [Database Credentials](../guides/gilhari_setup.md#database-credentials).
+* Don't put real credentials in examples or files you share; use placeholders like the ones above.
 
 ---
 

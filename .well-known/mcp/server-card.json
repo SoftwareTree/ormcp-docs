@@ -1,7 +1,7 @@
 {
   "serverInfo": {
     "name": "ORMCP Server",
-    "version": "1.0.0"
+    "version": "0.7.0"
   },
   "authentication": {
     "required": false
@@ -9,53 +9,272 @@
   "tools": [
     {
       "name": "getObjectModelSummary",
-      "description": "Get schema information about the object model including classes, attributes, primary keys, and relationships.",
-      "inputSchema": { "type": "object", "properties": {} }
+      "description": "Get comprehensive information about the underlying object model.",
+      "inputSchema": {
+        "properties": {},
+        "type": "object"
+      }
     },
     {
       "name": "query",
-      "description": "Query business objects of a specific type with optional filtering and sorting.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" } }, "required": ["className"] }
+      "description": "Query all qualifying objects of a particular type (class) based on the filter condition. Returns a JSON array of the qualifying objects (an empty array [] if none qualify).",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "filter": {
+            "default": "",
+            "type": "string"
+          },
+          "maxObjects": {
+            "default": -1,
+            "type": "integer"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          },
+          "operationDetails": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "default": ""
+          },
+          "allowDuplicates": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "getObjectById",
-      "description": "Retrieve a specific business object by its primary key.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "id": { "type": "string" } }, "required": ["className", "id"] }
-    },
-    {
-      "name": "getAggregate",
-      "description": "Calculate aggregate values (COUNT, SUM, AVG, MIN, MAX) across business objects.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "function": { "type": "string" }, "attribute": { "type": "string" } }, "required": ["className", "function"] }
+      "description": "Query the object of a particular type (class) based on the id (primary key attribute values) of the object. The object is first checked in the cache (if configured for the class) before going to the database. Returns the object as a single JSON object (not an array), or null if no object has that id.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "primaryKey": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          },
+          "operationDetails": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "className",
+          "primaryKey"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "access",
-      "description": "Retrieve objects referenced by a specific attribute of a referencing business object.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "id": { "type": "string" }, "attribute": { "type": "string" } }, "required": ["className", "id", "attribute"] }
+      "description": "Retrieve the object(s) referenced by the attributeName attribute of a referencing object of a particular type (class). If the attribute is a collection object (e.g., List or Array), a JSON array of the referenced objects is returned (an empty array [] if there are none); otherwise the referenced object.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "jsonObject": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "attributeName": {
+            "type": "string"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          },
+          "operationDetails": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {}
+            ],
+            "default": ""
+          }
+        },
+        "required": [
+          "className",
+          "jsonObject",
+          "attributeName"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "getAggregate",
+      "description": "Query an aggregate value (COUNT, SUM, AVG, MIN, MAX) for an attribute of all qualifying objects of a particular type (class) based on the filter condition. Returns the aggregate as a single JSON value (e.g. 100), not a list of objects.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "attributeName": {
+            "type": "string"
+          },
+          "aggregateType": {
+            "type": "string"
+          },
+          "filter": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "className",
+          "attributeName",
+          "aggregateType"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "insert",
-      "description": "Save one or more business objects to the database.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+      "description": "Save (Insert) one or more JSON objects. Returns a short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "jsonObjects": {
+            "items": {},
+            "type": "array"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className",
+          "jsonObjects"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "update",
-      "description": "Update one or more existing business objects.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+      "description": "Update one or more JSON objects. Each object replaces the stored object with the same primary key, so include all of its attributes; to change only some attributes, use update2 with a filter on the primary key (e.g. filter \"id=65\", newValues [\"city\", \"Portland\"]). Returns a short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "jsonObjects": {
+            "items": {},
+            "type": "array"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className",
+          "jsonObjects"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "update2",
-      "description": "Bulk update business objects matching a filter condition.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" }, "updates": { "type": "object" } }, "required": ["className", "updates"] }
+      "description": "Bulk update selected attributes of all qualifying objects of a particular type (class) based on the filter condition with the new attribute values. If deep parameter is true, all the contained objects are also updated. Returns the number of top-level objects updated, as a JSON number.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "filter": {
+            "type": "string"
+          },
+          "newValues": {
+            "items": {},
+            "minItems": 1,
+            "type": "array"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className",
+          "filter",
+          "newValues"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "delete",
-      "description": "Delete specific business objects from the database.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "objects": { "type": "array" } }, "required": ["className", "objects"] }
+      "description": "Delete one or more JSON objects. Returns a short confirmation message (plain text, not JSON) when the operation succeeds; failures are reported as errors.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "jsonObjects": {
+            "items": {},
+            "type": "array"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className",
+          "jsonObjects"
+        ],
+        "type": "object"
+      }
     },
     {
       "name": "delete2",
-      "description": "Bulk delete business objects matching a filter condition.",
-      "inputSchema": { "type": "object", "properties": { "className": { "type": "string" }, "filter": { "type": "string" } }, "required": ["className"] }
+      "description": "Bulk delete all qualifying objects of a particular type (class) based on the filter condition. If deep parameter is true, all the contained objects are also deleted. Returns the number of top-level objects deleted, as a JSON number.",
+      "inputSchema": {
+        "properties": {
+          "className": {
+            "type": "string"
+          },
+          "filter": {
+            "default": "",
+            "type": "string"
+          },
+          "deep": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "className"
+        ],
+        "type": "object"
+      }
     }
   ],
   "resources": [],

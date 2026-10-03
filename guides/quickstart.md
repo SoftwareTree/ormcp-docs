@@ -319,19 +319,17 @@ Here are all the users in the database:
 **Behind the scenes:**
 ```json
 {
-  "name": "update",
+  "name": "update2",
   "arguments": {
     "className": "User",
-    "jsonObjects": [
-      {
-        "id": 65,
-        "city": "Portland"
-      }
-    ],
+    "filter": "id=65",
+    "newValues": ["city", "Portland"],
     "deep": false
   }
 }
 ```
+
+`update2` changes only the listed attributes of the objects matching the filter; here, the one user with id 65. (`update` would replace the whole object, so it needs all attributes.)
 
 ### Bulk Operations
 
@@ -426,6 +424,7 @@ CREATE TABLE users (
 | `GILHARI_TIMEOUT` | API timeout (seconds) | `30` | `60` |
 | `LOG_LEVEL` | Logging verbosity | `INFO` | `DEBUG`, `WARNING`, `ERROR` |
 | `READONLY_MODE` | Expose only read operations | `True` | `False` |
+| `ORMCP_LOG_FILE` | Log file, in addition to the console; `none` for console only | `ormcp_server_debug.log` in the system's temp directory | `none` |
 
 ### Read-Only Mode
 
@@ -475,6 +474,8 @@ Try other Gilhari example repositories:
 
 ### ORMCP won't start
 
+If ORMCP stops with `Failed to ensure Gilhari microservice availability at ... (probed ...)`, no Gilhari microservice answered at that address; the 💡 line after it says what to do. `GILHARI_BASE_URL` must use the port Gilhari listens on — for a Docker container, the host port shown by `docker ps`.
+
 **Check Gilhari is running:**
 ```bash
 curl http://localhost:80/gilhari/v1/getObjectModelSummary/now
@@ -499,9 +500,9 @@ echo %GILHARI_BASE_URL%
 ### Queries fail
 
 1. **Verify class names** - Check `getObjectModelSummary` output
-2. **Check filter syntax** - Use SQL-like WHERE clause syntax
+2. **Check filter syntax** - Use SQL-like WHERE clause syntax, with attribute names from `getObjectModelSummary` (not database column names)
 3. **Review Gilhari logs** - Check Docker container logs
-4. **Enable debug mode** - Set `LOG_LEVEL=DEBUG`
+4. **Enable debug mode** - Set `LOG_LEVEL=DEBUG`; ORMCP's log is also in `ormcp_server_debug.log` in the system's temp directory
 
 📖 **[Complete Troubleshooting Guide](troubleshooting.md)**
 

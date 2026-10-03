@@ -36,8 +36,8 @@ Paste any error messages, stack traces, or log output here
 ## Environment
 
 **ORMCP Server:**
-- Version: [e.g., 0.4.3]
-- Installation method: [PyPI / Gemfury]
+- Version: [output of `ormcp-server --version`, e.g., 0.7.0]
+- Installation method: [PyPI / source distribution]
 - Transport mode: [STDIO / HTTP]
 
 **System:**
@@ -46,7 +46,7 @@ Paste any error messages, stack traces, or log output here
 - Docker version: [e.g., 24.0.6]
 
 **Gilhari:**
-- Gilhari version: [e.g., latest]
+- Gilhari version: [the "version" reported by `curl http://localhost:80/gilhari/v1/health/check`, e.g., 0.8.9]
 - Database: [e.g., PostgreSQL 15, SQLite 3.42]
 - Example used: [e.g., gilhari_example1]
 
@@ -79,6 +79,8 @@ MCP_SERVER_NAME=MyORMCPServer
 **ORMCP Server Logs:**
 ```
 Paste relevant ORMCP logs here
+(ORMCP also writes them to ormcp_server_debug.log in the system's temp
+directory: %TEMP% on Windows, $TMPDIR on macOS, usually /tmp on Linux)
 ```
 
 **Gilhari Logs:**

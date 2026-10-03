@@ -27,7 +27,7 @@ Send an `initialize` request to establish the connection and negotiate protocol 
   "id": 2,
   "method": "initialize",
   "params": {
-    "protocolVersion": "2024-11-05",
+    "protocolVersion": "2025-06-18",
     "capabilities": {
       "roots": {
         "listChanged": true
@@ -42,23 +42,28 @@ Send an `initialize` request to establish the connection and negotiate protocol 
 }
 ```
 
-**Expected Response:**
+**Expected Response** (shortened):
 ```json
 {
   "jsonrpc": "2.0",
   "id": 2,
   "result": {
-    "protocolVersion": "2024-11-05",
+    "protocolVersion": "2025-06-18",
     "capabilities": {
-      "tools": {}
+      "tools": {"listChanged": true},
+      "resources": {"subscribe": false, "listChanged": true},
+      "prompts": {"listChanged": true}
     },
     "serverInfo": {
       "name": "ORMCPServerDemo",
-      "version": "0.4.3"
-    }
+      "version": "0.7.0"
+    },
+    "instructions": "IMPORTANT: Before using any data operations, read the resource://object_model_summary resource ..."
   }
 }
 ```
+
+`serverInfo.version` is the ORMCP Server version (since 0.7.0). `instructions` contains ORMCP's usage guidance for the client.
 
 ### 2. Send Initialized Notification
 
@@ -144,7 +149,7 @@ Retrieve information about the database schema and available object types.
 }
 ```
 
-**Expected Response:**
+**Expected Response** (the summary is text, in the ORM specification's notation):
 ```json
 {
   "jsonrpc": "2.0",
@@ -153,9 +158,10 @@ Retrieve information about the database schema and available object types.
     "content": [
       {
         "type": "text",
-        "text": "{\n  \"classes\": [\n    {\n      \"name\": \"User\",\n      \"attributes\": [...],\n      \"primaryKey\": [\"id\"]\n    }\n  ]\n}"
+        "text": "CLASS User\n   ATTRIB id ATTRIB_TYPE int\n   ATTRIB name ATTRIB_TYPE java.lang.String\n   PRIMARY_KEY id\n;"
       }
-    ]
+    ],
+    "isError": false
   }
 }
 ```
@@ -192,10 +198,16 @@ Query objects of a specific type with optional filtering.
         "type": "text",
         "text": "[{\"id\": 1, \"name\": \"John Doe\", \"age\": 35}, ...]"
       }
-    ]
+    ],
+    "structuredContent": {
+      "result": "[{\"id\": 1, \"name\": \"John Doe\", \"age\": 35}, ...]"
+    },
+    "isError": false
   }
 }
 ```
+
+The objects arrive as a JSON array in text form; parse `content[0].text` (or `structuredContent.result`) as JSON. An empty array `[]` means no object qualified.
 
 ### Example 3: Get Object By ID
 
@@ -302,7 +314,9 @@ Update existing objects with new values.
         {
           "id": 100,
           "name": "Jane Smith-Johnson",
-          "age": 29
+          "age": 29,
+          "city": "San Francisco",
+          "state": "CA"
         }
       ],
       "deep": false
@@ -310,6 +324,8 @@ Update existing objects with new values.
   }
 }
 ```
+
+`update` replaces each stored object with the one given (matched by primary key), so include all of its attributes. To change only some attributes, use `update2` with a filter on the primary key.
 
 ### Example 8: Delete Objects
 
@@ -335,21 +351,25 @@ Delete specific objects from the database.
 
 ## Error Responses
 
-If a tool call fails, ORMCP Server returns an error response:
+If a tool call fails — invalid arguments, or an error from Gilhari or the database — ORMCP Server still returns a `result`, with `"isError": true` and the error message as text:
 
 ```json
 {
   "jsonrpc": "2.0",
   "id": 12,
-  "error": {
-    "code": -32000,
-    "message": "Tool execution failed",
-    "data": {
-      "details": "Class 'InvalidClass' not found in object model"
-    }
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Error calling tool 'query': HTTP 404: Error during query: ..."
+      }
+    ],
+    "isError": true
   }
 }
 ```
+
+A JSON-RPC `error` object (with `code` and `message`, instead of `result`) is returned only for protocol-level problems, such as an unknown method or a malformed request.
 
 ## Request ID Guidelines
 
@@ -360,7 +380,7 @@ If a tool call fails, ORMCP Server returns an error response:
 
 ## Testing with Command Line
 
-You can test these messages manually using the ORMCP Server in STDIO mode:
+You can test these messages manually using the ORMCP Server in STDIO mode. The Gilhari microservice must be running at `GILHARI_BASE_URL` first; otherwise ORMCP exits at start-up with a message naming the address it checked.
 
 ```bash
 # Start ORMCP Server in STDIO mode
@@ -377,7 +397,7 @@ Then paste the JSON messages into stdin, one per line. Each message must be on a
 Here's a complete session from connection to tool call:
 
 ```json
-{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"roots":{"listChanged":true},"sampling":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}
+{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{"roots":{"listChanged":true},"sampling":{}},"clientInfo":{"name":"test-client","version":"1.0.0"}}}
 
 {"jsonrpc":"2.0","method":"notifications/initialized"}
 
@@ -406,7 +426,7 @@ Here's a complete session from connection to tool call:
 - Verify the tool name is spelled correctly (case-sensitive)
 - Ensure all required arguments are provided
 - Check that class names match your Gilhari object model
-- Review the error response for specific failure details
+- Look for `"isError": true` in the `result`; the error message is in `content[0].text`
 
 **Response parsing:**
 - Responses are also single-line JSON messages
