@@ -77,9 +77,9 @@ cd gilhari_example1
 docker pull softwaretree/gilhari:latest
 
 # Build the example microservice
-./build.sh   # Linux/Mac
+./gilhari/build.sh   # Linux/Mac
 # or
-./build.cmd  # Windows
+gilhari\build.cmd    # Windows
 
 # Run the microservice
 docker run -p 80:8081 gilhari_example1:1.0
@@ -96,10 +96,10 @@ You should see JSON output describing the User object model.
 **Optional: Populate with sample data**
 ```bash
 # Linux/Mac
-./curlCommandsPopulate.sh
+./gilhari/curlCommandsPopulate.sh
 
 # Windows
-./curlCommandsPopulate.cmd
+gilhari\curlCommandsPopulate.cmd
 ```
 
 📖 **Need more details?** See the [Gilhari Setup Guide](gilhari_setup.md)

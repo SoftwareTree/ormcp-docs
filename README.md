@@ -175,17 +175,17 @@ cd gilhari_example1
 docker pull softwaretree/gilhari:latest
 
 # Build a Docker image for the sample Gilhari microservice
-./build.cmd  # On Windows
+gilhari\build.cmd    # On Windows
 # or
-./build.sh   # On Linux/Mac
+./gilhari/build.sh   # On Linux/Mac
 
 # Run the sample microservice
 docker run -p 80:8081 gilhari_example1:1.0
 
 # Optionally, populate the database with sample data
-./curlCommandsPopulate.cmd  # On Windows
+gilhari\curlCommandsPopulate.cmd    # On Windows
 # or
-./curlCommandsPopulate.sh   # On Linux/Mac
+./gilhari/curlCommandsPopulate.sh   # On Linux/Mac
 ```
 
 #### 3. Configure Environment
@@ -394,17 +394,17 @@ git clone https://github.com/SoftwareTree/gilhari_example1.git
 cd gilhari_example1
 
 # Build a Docker image for the sample Gilhari microservice
-./build.cmd  # On Windows
+gilhari\build.cmd    # On Windows
 # or
-./build.sh   # On Linux/Mac
+./gilhari/build.sh   # On Linux/Mac
 
 # Run the sample microservice
 docker run -p 80:8081 gilhari_example1:1.0
 
 # Optionally, populate the database with sample data
-./curlCommandsPopulate.cmd  # On Windows
+gilhari\curlCommandsPopulate.cmd    # On Windows
 # or
-./curlCommandsPopulate.sh   # On Linux/Mac
+./gilhari/curlCommandsPopulate.sh   # On Linux/Mac
 ```
 
 For detailed setup and configuration instructions, see the [gilhari\_example1 README](https://github.com/SoftwareTree/gilhari_example1/blob/main/README.md).
@@ -1137,7 +1137,7 @@ For common issues and solutions, see the [Complete Troubleshooting Guide](https:
 
 **Gilhari Example Issues:**
 
-* Shell script permission denied → `chmod +x *.sh` or use `sh build.sh` (Linux/Mac)
+* Shell script permission denied → `chmod +x scripts/*.sh gilhari/*.sh` or use `sh gilhari/build.sh` (Linux/Mac)
 * Database connection errors → Verify JDBC driver in Gilhari
 
 **Runtime Issues:**

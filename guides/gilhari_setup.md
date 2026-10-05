@@ -71,37 +71,43 @@ Gilhari is a Docker-compatible microservice framework that provides RESTful Obje
 
 ## Project Structure
 
-A typical Gilhari microservice project has the following structure:
+A typical Gilhari microservice project has the following structure (the same layout is used by the [example repositories](../examples/) and by the projects that [ORM_Skyway](https://github.com/SoftwareTree/orm_skyway_automation) generates):
 
 ```
 my_gilhari_service/
-├── src/                              # Source files
-│   └── com/mycompany/myapp/model/    # Container domain model classes
+├── src/                                 # Source files
+│   └── com/mycompany/myapp/model/       # Container domain model classes
 │       ├── MyClass1.java
 │       ├── MyClass2.java
 │       └── ...
-├── bin/                              # Compiled .class files
+├── bin/                                 # Compiled .class files
 │   └── com/mycompany/myapp/model/
 │       ├── MyClass1.class
 │       ├── MyClass2.class
 │       └── ...
-├── config/                           # Configuration files
-│   ├── my_service.jdx               # ORM specification
-│   ├── classnames_map.js            # Class name mappings (optional)
-│   └── [jdbc-driver.jar]            # JDBC driver (recommended location)
-├── Dockerfile                        # Docker image definition
-├── gilhari_service.config           # Service configuration
-├── compile.cmd / .sh                # Compilation script
-├── build.cmd / .sh                  # Docker build script
-├── run_docker_app.cmd / .sh         # Docker run script
-├── sources.txt                      # List of source files to compile
-└── curlCommands.cmd / .sh           # API testing scripts (optional)
+├── config/                              # Configuration files
+│   ├── my_service.jdx                   # ORM specification
+│   ├── classnames_map.json              # Class name mappings (optional)
+│   └── [jdbc-driver.jar]                # JDBC driver (recommended location)
+├── scripts/                             # Development scripts
+│   └── compile.cmd / .sh                # Compiles the container domain model classes
+├── gilhari/                             # Gilhari microservice (Docker) related files
+│   ├── Dockerfile                       # Docker image definition
+│   ├── gilhari_service.config           # Service configuration
+│   ├── build.cmd / .sh                  # Builds the Docker image
+│   ├── run_docker_app.cmd / .sh         # Runs the Docker container
+│   └── curlCommands.cmd / .sh           # REST API testing scripts (optional)
+└── .dockerignore                        # Keeps unneeded files out of the Docker build context
 ```
+
+All scripts are run from the project root directory, for example `./gilhari/build.sh` (Linux/Mac) or `gilhari\build.cmd` (Windows). The compile script generates `sources.txt` (the list of Java source files to compile) each time it runs.
 
 **Key directories:**
 - **src/** - Contains Java source files for container domain model classes
 - **bin/** - Contains compiled .class files (generated from src/)
 - **config/** - Contains ORM specification, JDBC driver, and optional mappings
+- **scripts/** - Contains the compile script
+- **gilhari/** - Contains the Dockerfile, service configuration, and build, run and test scripts
 
 ---
 
@@ -409,7 +415,7 @@ JDX:jdbc:<db_type>://<host>:<port>/<database>;USER=<username>;PASSWORD=<password
 - PostgreSQL: `jdbc:postgresql://localhost:5432/mydb`
 - MS SQL Server: `jdbc:sqlserver://localhost:1433;database=mydb`
 
-See the [Database Configuration Guide](../examples/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md) for comprehensive database configuration examples.
+See the [JDX_DATABASE and JDBC_DRIVER Specification Guide](https://github.com/SoftwareTree/jdx-docs/blob/main/guides/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md) for database configuration examples.
 
 **VIRTUAL_ATTRIB Types:**
 - Primitives: `int`, `long`, `float`, `double`, `boolean`
@@ -430,11 +436,11 @@ RELATIONSHIP <attributeName> REFERENCES <className> BYVALUE [OPTIONS]
 
 ### 3. Service Configuration File
 
-The `gilhari_service.config` file (located at project root) specifies runtime parameters for your Gilhari microservice.
+The `gilhari_service.config` file (located in the `gilhari/` directory) specifies runtime parameters for your Gilhari microservice. The Dockerfile copies it into the image's working directory, and the paths in it are paths inside the container, relative to that directory.
 
 #### Example 1: Basic Configuration
 
-From `gilhari_example1/gilhari_service.config`:
+From `gilhari_example1/gilhari/gilhari_service.config`:
 
 ```json
 {
@@ -444,14 +450,14 @@ From `gilhari_example1/gilhari_service.config`:
   "jdx_debug_level": 3,
   "jdx_force_create_schema": "true",
   "jdx_persistent_classes_location": "./bin",
-  "classnames_map_file": "config/classnames_map_example.js",
+  "classnames_map_file": "config/classnames_map_example.json",
   "gilhari_rest_server_port": 8081
 }
 ```
 
 #### Example 2: Relationships Configuration
 
-From `gilhari_relationships_example/gilhari_service.config`:
+From `gilhari_relationships_example/gilhari/gilhari_service.config`:
 
 ```json
 {
@@ -461,7 +467,7 @@ From `gilhari_relationships_example/gilhari_service.config`:
   "jdx_debug_level": 5,
   "jdx_force_create_schema": "true",
   "jdx_persistent_classes_location": "./bin",
-  "classnames_map_file": "config/classnames_map_example.js",
+  "classnames_map_file": "config/classnames_map_example.json",
   "gilhari_rest_server_port": 8081
 }
 ```
@@ -538,9 +544,9 @@ POST /gilhari/v1/User
 
 #### Example
 
-From `config/classnames_map_example.js`:
+From `config/classnames_map_example.json`:
 
-```javascript
+```json
 {
     "User": "com.softwaretree.gilhariexample1.model.User",
     "A": "com.softwaretree.jdxjson2example.model.A",
@@ -553,7 +559,7 @@ From `config/classnames_map_example.js`:
 
 Reference in `gilhari_service.config`:
 ```json
-"classnames_map_file": "config/classnames_map_example.js"
+"classnames_map_file": "config/classnames_map_example.json"
 ```
 
 **Note:** This is optional. If not provided, use fully-qualified class names in REST URLs.
@@ -566,7 +572,7 @@ The Dockerfile builds your application-specific Gilhari microservice image from 
 
 #### Example 1: Basic Dockerfile
 
-From `gilhari_example1/Dockerfile`:
+From `gilhari_example1/gilhari/Dockerfile`:
 
 ```dockerfile
 # Create docker image for RESTful server providing JSON object persistence
@@ -576,10 +582,12 @@ From `gilhari_example1/Dockerfile`:
 FROM softwaretree/gilhari
 WORKDIR /opt/gilhari_example1
 
-# Add compiled classes, configuration files, and service config
+# The build context is the project root (see gilhari/build.cmd and build.sh:
+# docker build -f gilhari/Dockerfile .), so the ADD source paths below are
+# relative to the project root, not to this gilhari/ directory.
 ADD bin ./bin
 ADD config ./config
-ADD gilhari_service.config .
+ADD gilhari/gilhari_service.config .
 
 # Expose the service port
 EXPOSE 8081 
@@ -590,7 +598,7 @@ CMD ["node", "/node/node_modules/gilhari_rest_server/gilhari_rest_server.js", "g
 
 #### Example 2: Relationships Dockerfile
 
-From `gilhari_relationships_example/Dockerfile`:
+From `gilhari_relationships_example/gilhari/Dockerfile`:
 
 ```dockerfile
 FROM softwaretree/gilhari
@@ -598,7 +606,7 @@ WORKDIR /opt/gilhari_relationships_example
 
 ADD bin ./bin
 ADD config ./config
-ADD gilhari_service.config .
+ADD gilhari/gilhari_service.config .
 
 EXPOSE 8081 
 CMD ["node", "/node/node_modules/gilhari_rest_server/gilhari_rest_server.js", "gilhari_service.config"]
@@ -616,9 +624,10 @@ CMD ["node", "/node/node_modules/gilhari_rest_server/gilhari_rest_server.js", "g
 - All subsequent paths are relative to this directory
 
 **ADD commands**
+- The Dockerfile is in `gilhari/`, but the Docker build context is the project root (`docker build -f gilhari/Dockerfile .`), so the source paths are relative to the project root
 - `ADD bin ./bin` - Copies compiled .class files
 - `ADD config ./config` - Copies ORM spec, JDBC driver, and mappings
-- `ADD gilhari_service.config .` - Copies service configuration to root
+- `ADD gilhari/gilhari_service.config .` - Copies the service configuration into the working directory
 
 **EXPOSE 8081**
 - Documents the port used by the service inside container
@@ -815,149 +824,132 @@ curl -G "http://localhost:80/gilhari/v1/A?deep=false" \
 
 ## Compilation and Build
 
+All scripts are run from the project root directory. They also work when started from another directory, because each one first switches to the project root.
+
 ### Running Shell Scripts on Mac/Linux
 
-After cloning an example repository or extracting the SDK, shell scripts may not have execute permissions.
+The example repositories keep the execute permission of their `.sh` files, but it can be lost when a project is extracted from a ZIP/JAR archive, copied from Windows, or downloaded as a source distribution.
 
 **If you encounter permission errors:**
 ```bash
-zsh: permission denied: ./build.sh
+zsh: permission denied: ./gilhari/build.sh
 ```
 
 **Solution 1: Add execute permissions**
 ```bash
-chmod +x build.sh compile.sh run_docker_app.sh
-./build.sh
+chmod +x scripts/*.sh gilhari/*.sh
+./gilhari/build.sh
 ```
 
 **Solution 2: Run with sh directly**
 ```bash
-sh build.sh
-sh compile.sh
-sh run_docker_app.sh
+sh scripts/compile.sh
+sh gilhari/build.sh
+sh gilhari/run_docker_app.sh
 ```
 
-**Why this happens:** Shell script execute permissions may not be preserved when:
-- Extracting from ZIP/JAR archives
-- Cloning on Windows and checking out on Mac/Linux
-- Downloading source distributions
+### Step 1: Compile the Container Classes
 
-**Note:** We've configured our Git repositories to preserve execute permissions, but they may still be lost in certain distribution methods.
+The compile script (`scripts/compile.cmd` / `scripts/compile.sh`) compiles every `.java` file under `src/` into `bin/`. It first writes the list of source files to `sources.txt`, so that file is generated each time and does not need to be maintained by hand or committed. It then runs `javac` with Java 8 compatibility (`--release 8` on JDK 9 and later), as required by the current Gilhari version.
 
-
-### Step 1: Prepare Source Files
-
-Create `sources.txt` listing all container class source files:
-
-```
-src/com/softwaretree/gilhariexample1/model/User.java
-```
-
-For relationships example:
-```
-src/com/softwaretree/jdxjson2example/model/A.java
-src/com/softwaretree/jdxjson2example/model/B.java
-src/com/softwaretree/jdxjson2example/model/C.java
-```
-
-### Step 2: Create Compilation Script
-
-**Windows (compile.cmd):**
-```batch
-@echo off
-REM Compile container domain model classes targeting JDK 1.8
-
-set CLASSPATH=%JX_HOME%\JDXAndroid\libs\jdxjson-2.0.jar;%JX_HOME%\JDXAndroid\libs\json-20090211.jar
-
-javac -source 1.8 -target 1.8 -d bin @sources.txt
-
-echo Compilation complete. Class files are in bin/ directory.
-```
-
-**Linux/Mac (compile.sh):**
+**Linux/Mac (`scripts/compile.sh` from gilhari_example1, shortened):**
 ```bash
 #!/bin/bash
-# Compile container domain model classes targeting JDK 1.8
+cd "$(dirname "$0")/.."            # switch to the project root
+JX_HOME="${JX_HOME:-$PWD/../..}"   # root directory of the Gilhari SDK
+mkdir -p ./bin
 
-export CLASSPATH=$JX_HOME/JDXAndroid/libs/jdxjson-2.0.jar:$JX_HOME/JDXAndroid/libs/json-20090211.jar
+# List all the .java files under src/ for javac
+find src -name "*.java" | sort > sources.txt
 
-javac -source 1.8 -target 1.8 -d bin @sources.txt
+# JDK 9 or higher: --release 8 produces Java 8 compatible classes
+RELEASE_FLAG=""
+if javac -help 2>&1 | grep -q -- "--release"; then
+    RELEASE_FLAG="--release 8 -Xlint:-options"
+fi
 
-echo "Compilation complete. Class files are in bin/ directory."
+javac $RELEASE_FLAG -d ./bin -cp ".:$JX_HOME/libs/jxclasses.jar:$JX_HOME/external_libs/json-20240303.jar" @sources.txt
 ```
 
-### Step 3: Compile
+The Windows script (`scripts\compile.cmd`) does the same.
 
+Run:
 ```bash
 # Windows
-compile.cmd
+scripts\compile.cmd
 
 # Linux/Mac
-chmod +x compile.sh
-./compile.sh
+./scripts/compile.sh
 ```
 
 **Requirements:**
-- `JX_HOME` environment variable must be set
-- JDK 1.8+ must be installed
-- Creates .class files in `bin/` directory
+- `JX_HOME` set to the root directory of the Gilhari SDK. If it is not set, the scripts use `../..` (relative to the project root), which is the SDK root when the project is in the SDK's `examples` directory; they stop with a message if the SDK libraries are not found
+- JDK 1.8+ installed
+- Creates .class files in `bin/`
 
-### Step 4: Build Docker Image
+### Step 2: Build the Docker Image
 
-**Windows (build.cmd):**
-```batch
-@echo off
-docker build -t gilhari_example1:1.0 .
-echo Docker image built: gilhari_example1:1.0
-```
+The Dockerfile is in `gilhari/`, but the Docker build context is the project root, because the image needs `bin/` and `config/`.
 
-**Linux/Mac (build.sh):**
+**Linux/Mac (`gilhari/build.sh`):**
 ```bash
 #!/bin/bash
-docker build -t gilhari_example1:1.0 .
-echo "Docker image built: gilhari_example1:1.0"
+cd "$(dirname "$0")/.."     # the build context must be the project root
+docker build --platform linux/amd64 -f gilhari/Dockerfile -t gilhari_example1:1.0 .
+docker images
+```
+
+**Windows (`gilhari\build.cmd`):**
+```batch
+@echo off
+cd /d "%~dp0.."
+docker build --platform linux/amd64 -f gilhari/Dockerfile -t gilhari_example1:1.0 .
+docker images
+```
+
+`--platform linux/amd64` is used because the `softwaretree/gilhari` base image is published for linux/amd64 only (it runs under emulation on Apple Silicon). A `.dockerignore` file in the project root keeps files the image does not need (such as `src/`, `scripts/` and `.git`) out of the build context; Docker reads it from the build context, so it must stay in the project root.
+
+Run:
+```bash
+# Windows
+gilhari\build.cmd
+
+# Linux/Mac
+./gilhari/build.sh
+```
+
+### Step 3: Run the Docker Container
+
+**Linux/Mac (`gilhari/run_docker_app.sh`)** and **Windows (`gilhari\run_docker_app.cmd`)** run:
+```bash
+docker run --platform linux/amd64 -p 80:8081 gilhari_example1:1.0
 ```
 
 Run:
 ```bash
 # Windows
-build.cmd
+gilhari\run_docker_app.cmd
 
 # Linux/Mac
-chmod +x build.sh
-./build.sh
-```
-
-### Step 5: Run Docker Container
-
-**Windows (run_docker_app.cmd):**
-```batch
-@echo off
-docker run -d -p 80:8081 --name gilhari_example1 gilhari_example1:1.0
-echo Service running at http://localhost:80
-```
-
-**Linux/Mac (run_docker_app.sh):**
-```bash
-#!/bin/bash
-docker run -d -p 80:8081 --name gilhari_example1 gilhari_example1:1.0
-echo "Service running at http://localhost:80"
-```
-
-Run:
-```bash
-# Windows
-run_docker_app.cmd
-
-# Linux/Mac
-chmod +x run_docker_app.sh
-./run_docker_app.sh
+./gilhari/run_docker_app.sh
 ```
 
 **Port Mapping:**
 - `-p 80:8081` maps container port 8081 to host port 80
 - Access service at `http://localhost:80`
 - Change `80` to use different external port (e.g., `-p 8080:8081`)
+
+### Step 4: Test with the curl Scripts (Optional)
+
+```bash
+# Windows
+gilhari\curlCommands.cmd
+
+# Linux/Mac
+./gilhari/curlCommands.sh
+```
+
+The curl scripts first call `http://localhost:<port>/gilhari/v1/health/check` and stop with a message if the microservice is not responding. They take an optional port number as the first argument (default 80), for example `./gilhari/curlCommands.sh 8080`, and write the responses to `curl.log`.
 
 ---
 
@@ -1051,7 +1043,7 @@ For AI-powered database interactions using ORMCP Server with Gilhari:
 - **Check**: Run compilation before building Docker image
 
 **Problem**: Port 80 already in use
-- **Solution**: Change port mapping in `run_docker_app` script
+- **Solution**: Stop the service that is using port 80, or change the port mapping in the `gilhari/run_docker_app` script
 - **Example**: `-p 8080:8081` instead of `-p 80:8081`
 
 #### Runtime Issues
@@ -1075,7 +1067,7 @@ For AI-powered database interactions using ORMCP Server with Gilhari:
 
 **Problem**: `JDBC Driver not found`
 - **Solution**: 
-  - Verify JDBC driver path in `gilhari_service.config`
+  - Verify JDBC driver path in `gilhari/gilhari_service.config`
   - Ensure driver JAR is in `config/` directory
   - Check that Dockerfile includes: `ADD config ./config`
 
@@ -1251,8 +1243,8 @@ For AI-powered database interactions using ORMCP Server with Gilhari:
 
 - **JDX User Manual**: Comprehensive ORM documentation (included in Gilhari SDK)
 - **Gilhari SDK**: Full SDK with examples and libraries from [https://softwaretree.com](https://softwaretree.com)
-- **[Database Configuration Guide](../examples/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations
-- **[operationDetails Documentation](../examples/operationDetails_doc.md)** - Advanced query capabilities
+- **[Database Configuration Guide](https://github.com/SoftwareTree/jdx-docs/blob/main/guides/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations (in jdx-docs)
+- **[operationDetails Documentation](https://github.com/SoftwareTree/gilhari-docs/blob/main/reference/operationDetails.md)** - Advanced query capabilities (in gilhari-docs)
 - **Example Repositories**: Working examples on GitHub
 
 #### Support Channels
@@ -1272,11 +1264,12 @@ For AI-powered database interactions using ORMCP Server with Gilhari:
 - [ ] Compiled classes (.class) in `bin/`
 - [ ] ORM specification (.jdx) in `config/`
 - [ ] JDBC driver JAR in `config/` (if not using default SQLite)
-- [ ] Service configuration (gilhari_service.config) in root
-- [ ] Dockerfile in root
-- [ ] Compilation script (compile.cmd/.sh)
-- [ ] Build script (build.cmd/.sh)
-- [ ] Run script (run_docker_app.cmd/.sh)
+- [ ] Service configuration (`gilhari_service.config`) in `gilhari/`
+- [ ] Dockerfile in `gilhari/`
+- [ ] `.dockerignore` in the project root
+- [ ] Compilation script (`scripts/compile.cmd` / `.sh`)
+- [ ] Build script (`gilhari/build.cmd` / `.sh`)
+- [ ] Run script (`gilhari/run_docker_app.cmd` / `.sh`)
 - [ ] Optional: classnames_map file in `config/`
 - [ ] Optional: curl test scripts
 
@@ -1285,28 +1278,28 @@ For AI-powered database interactions using ORMCP Server with Gilhari:
 **Compilation:**
 ```bash
 # Windows
-compile.cmd
+scripts\compile.cmd
 
 # Linux/Mac
-./compile.sh
+./scripts/compile.sh
 ```
 
 **Build Docker Image:**
 ```bash
 # Windows
-build.cmd
+gilhari\build.cmd
 
 # Linux/Mac
-./build.sh
+./gilhari/build.sh
 ```
 
 **Run Service:**
 ```bash
 # Windows
-run_docker_app.cmd
+gilhari\run_docker_app.cmd
 
 # Linux/Mac
-./run_docker_app.sh
+./gilhari/run_docker_app.sh
 ```
 
 **Docker Management:**
@@ -1406,8 +1399,8 @@ With these components properly configured, Gilhari handles all the REST API gene
 
 ---
 
-**Document Version:** 1.1  
-**Last Updated:** 2026-10-02 (Gilhari 0.8.9, JDX 5.29)  
+**Document Version:** 1.2  
+**Last Updated:** 2026-10-04 (Gilhari 0.8.9, JDX 5.29; scripts/ and gilhari/ project layout)  
 **Copyright:** Software Tree  
 
 For the latest documentation and updates, visit [https://www.softwaretree.com](https://www.softwaretree.com)

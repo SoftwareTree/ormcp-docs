@@ -30,9 +30,9 @@ cd gilhari_example1
 docker pull softwaretree/gilhari:latest
 
 # 3. Build the example microservice
-./build.sh   # Linux/Mac
+./gilhari/build.sh   # Linux/Mac
 # or
-build.cmd    # Windows
+gilhari\build.cmd    # Windows
 
 # 4. Run the microservice
 docker run -d -p 80:8081 --name gilhari_example1 gilhari_example1:1.0
@@ -231,27 +231,32 @@ Each example repository follows this standard structure:
 
 ```
 gilhari_example_name/
-├── README.md                    # Complete setup instructions
-├── Dockerfile                   # Docker image configuration
-├── gilhari_service.config       # Gilhari microservice runtime configuration
-├── build.sh / build.cmd         # Docker image build scripts
-├── run_docker_app.sh / .cmd     # Container run scripts
-├── compile.sh / compile.cmd     # Java compilation scripts
-├── sources.txt                  # List of Java source files
-├── src/                         # Java container domain model classes
+├── README.md                            # Complete setup instructions
+├── src/                                 # Java container domain model classes
 │   └── com/softwaretree/.../model/
-│       └── *.java               # Container classes (extend JDX_JSONObject)
-├── bin/                         # Compiled .class files (generated)
+│       └── *.java                       # Container classes (extend JDX_JSONObject)
+├── bin/                                 # Compiled .class files (generated)
 │   └── com/softwaretree/.../model/
 │       └── *.class
-├── config/                      # Configuration files
-│   ├── *.jdx                    # ORM specification file
-│   ├── *.db                     # SQLite database (if using SQLite)
-│   ├── classnames_map*.js       # Optional class name mappings
-│   └── [jdbc-driver.jar]        # JDBC driver (if not using default)
-├── curlCommands.sh / .cmd       # API testing scripts
-└── curlCommandsPopulate.sh/.cmd # Data population scripts
+├── config/                              # Configuration files
+│   ├── *.jdx                            # ORM specification file
+│   ├── *.db                             # SQLite database (if using SQLite)
+│   ├── classnames_map*.json             # Optional class name mappings
+│   └── [jdbc-driver.jar]                # JDBC driver (if not using default)
+├── scripts/                             # Development scripts
+│   └── compile.sh / .cmd                # Compiles the container domain model classes
+├── gilhari/                             # Gilhari microservice (Docker) related files
+│   ├── Dockerfile                       # Docker image definition
+│   ├── gilhari_service.config           # Gilhari microservice runtime configuration
+│   ├── build.sh / .cmd                  # Builds the Docker image
+│   ├── run_docker_app.sh / .cmd         # Runs the Docker container
+│   ├── curlCommands.sh / .cmd           # REST API testing scripts
+│   ├── curlCommandsPopulate.sh / .cmd   # Populate sample data via the REST API
+│   └── connectORMCP.md                  # Connecting ORMCP Server to this microservice
+└── kubernetes/                          # Sample Kubernetes deployment (some examples)
 ```
+
+All scripts are run from the project root directory, for example `./gilhari/build.sh` (Linux/Mac) or `gilhari\build.cmd` (Windows). The Docker build context is the project root, so `.dockerignore` is in the project root too. `scripts/compile` generates `sources.txt` (the list of Java source files) each time it runs.
 
 ---
 
@@ -273,7 +278,7 @@ cd <example-name>
 docker pull softwaretree/gilhari:latest
 
 # Build the Docker image
-./build.sh  # or build.cmd on Windows
+./gilhari/build.sh  # or gilhari\build.cmd on Windows
 ```
 
 **3. Run Gilhari Microservice**
@@ -300,10 +305,10 @@ curl http://localhost:80/gilhari/v1/getObjectModelSummary/now
 
 ```bash
 # Run comprehensive API tests
-./curlCommands.sh      # or curlCommands.cmd on Windows
+./gilhari/curlCommands.sh      # or gilhari\curlCommands.cmd on Windows
 
 # Populate sample data
-./curlCommandsPopulate.sh
+./gilhari/curlCommandsPopulate.sh   # or gilhari\curlCommandsPopulate.cmd on Windows
 
 # View results
 cat curl.log
@@ -430,13 +435,13 @@ CLASS com.example.model.MyClass TABLE MY_TABLE
 
 ```bash
 # Ensure JX_HOME is set to Gilhari SDK location
-./compile.sh  # or compile.cmd on Windows
+./scripts/compile.sh  # or scripts\compile.cmd on Windows
 ```
 
 **4. Rebuild Docker Image**
 
 ```bash
-./build.sh
+./gilhari/build.sh   # or gilhari\build.cmd on Windows
 docker run -d -p 80:8081 --name custom-example custom-example:1.0
 ```
 
@@ -451,14 +456,14 @@ JDX_DATABASE JDX:jdbc:postgresql://host.docker.internal:5432/mydb;USER=myuser;PA
 JDBC_DRIVER org.postgresql.Driver
 ```
 
-See `JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md` for other database configurations.
+See the [JDX_DATABASE and JDBC_DRIVER Specification Guide](https://github.com/SoftwareTree/jdx-docs/blob/main/guides/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md) for other database configurations.
 
 **2. Download PostgreSQL JDBC Driver**
 
 - Download from [https://jdbc.postgresql.org/](https://jdbc.postgresql.org/)
 - Place `postgresql-42.7.1.jar` (or current version) in `config/` directory
 
-**3. Edit Service Configuration** (`gilhari_service.config`)
+**3. Edit Service Configuration** (`gilhari/gilhari_service.config`)
 
 ```json
 {
@@ -468,7 +473,7 @@ See `JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md` for other database configu
   "jdx_debug_level": 3,
   "jdx_force_create_schema": "true",
   "jdx_persistent_classes_location": "./bin",
-  "classnames_map_file": "config/classnames_map.js",
+  "classnames_map_file": "config/classnames_map.json",
   "gilhari_rest_server_port": 8081
 }
 ```
@@ -485,7 +490,7 @@ CREATE DATABASE mydb;
 **5. Rebuild and Run**
 
 ```bash
-./build.sh
+./gilhari/build.sh   # or gilhari\build.cmd on Windows
 docker run -d -p 80:8081 --name custom-example custom-example:1.0
 ```
 
@@ -513,7 +518,7 @@ docker pull softwaretree/gilhari:latest
 **Check for Build Errors:**
 ```bash
 # Review build output for errors
-./build.sh 2>&1 | tee build.log
+./gilhari/build.sh 2>&1 | tee build.log
 ```
 
 ### Example Won't Compile
@@ -533,7 +538,7 @@ javac -version  # Should be 1.8 or higher
 ```
 
 **Check Source Files:**
-- Ensure all `.java` files are listed in `sources.txt`
+- `sources.txt` is generated by `scripts/compile` from all `.java` files under `src/`; make sure your source files are under `src/`
 - Verify package declarations match directory structure
 
 ### Example Won't Run
@@ -622,8 +627,8 @@ Want to create a custom Gilhari microservice from scratch? See the comprehensive
 1. Define your domain model (Java container classes)
 2. Create ORM specification (.jdx file)
 3. Set up database and JDBC driver
-4. Configure service (gilhari_service.config)
-5. Create Dockerfile
+4. Configure service (`gilhari/gilhari_service.config`)
+5. Create Dockerfile (`gilhari/Dockerfile`)
 6. Build and test
 7. Document and share
 
@@ -641,8 +646,8 @@ Want to create a custom Gilhari microservice from scratch? See the comprehensive
 - **[Quick Start Guide](../guides/quickstart.md)** - Get started with ORMCP quickly
 - **[MCP Tools Reference](../reference/ormcp_tools_reference.md)** - API documentation
 - **[Troubleshooting Guide](../guides/troubleshooting.md)** - Common issues and solutions
-- **[Database Configuration Guide](JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations
-- **[operationDetails Documentation](operationDetails_doc.md)** - Advanced query capabilities
+- **[Database Configuration Guide](https://github.com/SoftwareTree/jdx-docs/blob/main/guides/JDX_DATABASE_JDBC_DRIVER_Specification_Guide.md)** - Database-specific configurations (in jdx-docs)
+- **[operationDetails Documentation](https://github.com/SoftwareTree/gilhari-docs/blob/main/reference/operationDetails.md)** - Advanced query capabilities (in gilhari-docs)
 
 ---
 

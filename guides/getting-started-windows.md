@@ -89,13 +89,13 @@ git clone https://github.com/SoftwareTree/gilhari_example1.git
 cd gilhari_example1
 
 REM Build the Docker image
-build.cmd
+gilhari\build.cmd
 
 REM Run the microservice (listens on port 80)
 docker run -p 80:8081 gilhari_example1:1.0
 
 REM (Optional) Populate the database with sample data
-curlCommandsPopulate.cmd
+gilhari\curlCommandsPopulate.cmd
 ```
 
 ### Build Your Own Gilhari Microservice

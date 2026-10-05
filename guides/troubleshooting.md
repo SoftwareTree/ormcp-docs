@@ -1011,8 +1011,8 @@ python -m ormcp_server
 
 **Error:**
 ```bash
-zsh: permission denied: ./build.sh
-bash: ./compile.sh: Permission denied
+zsh: permission denied: ./gilhari/build.sh
+bash: ./scripts/compile.sh: Permission denied
 ```
 
 **Solutions:**
@@ -1021,19 +1021,19 @@ bash: ./compile.sh: Permission denied
 
 ```bash
 # Make scripts executable
-chmod +x build.sh compile.sh run_docker_app.sh curlCommandsPopulate.sh
+chmod +x scripts/*.sh gilhari/*.sh
 
-# Then run normally
-./build.sh
+# Then run normally (from the project root)
+./gilhari/build.sh
 ```
 
 **Option 2: Run with sh directly**
 
 ```bash
-sh build.sh
-sh compile.sh
-sh run_docker_app.sh
-sh curlCommandsPopulate.sh
+sh scripts/compile.sh
+sh gilhari/build.sh
+sh gilhari/run_docker_app.sh
+sh gilhari/curlCommandsPopulate.sh
 ```
 
 **Why this happens:**
@@ -1061,7 +1061,7 @@ docker pull softwaretree/gilhari:latest
 ls bin/
 
 # Recompile if needed
-./compile.sh  # or compile.cmd on Windows
+./scripts/compile.sh  # or scripts\compile.cmd on Windows
 ```
 
 **3. Port already in use:**

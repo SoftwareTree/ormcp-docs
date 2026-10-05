@@ -65,13 +65,13 @@ git clone https://github.com/SoftwareTree/gilhari_example1.git
 cd gilhari_example1
 
 # Build the Docker image
-./build.sh
+./gilhari/build.sh
 
 # Run the microservice (listens on port 80)
 docker run -p 80:8081 gilhari_example1:1.0
 
 # (Optional) Populate the database with sample data
-./curlCommandsPopulate.sh
+./gilhari/curlCommandsPopulate.sh
 ```
 
 ### Build Your Own Gilhari Microservice
@@ -291,12 +291,12 @@ Modern macOS Python installations (via Homebrew or system Python) may block glob
 
 ### Shell script permission denied
 
-If `./build.sh` is not executable:
+If `./gilhari/build.sh` is not executable:
 
 ```bash
-chmod +x *.sh
+chmod +x scripts/*.sh gilhari/*.sh
 # then re-run
-./build.sh
+./gilhari/build.sh
 ```
 
 ### Enable debug logging
