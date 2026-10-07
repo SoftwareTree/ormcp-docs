@@ -2,7 +2,7 @@ Copyright (c) 2025, Software Tree
 
 # ORMCP Server - Beta
 
-_Last updated: 2026-10-02 (ORMCP 0.7.0)_
+_Last updated: 2026-10-06 (ORMCP 0.7.1)_
 
 *A Model Context Protocol (MCP) Server to connect your AI applications to relational databases*
 
@@ -496,9 +496,9 @@ The complete package includes:
 # Download the source distribution (.tar.gz)
 pip download --no-binary :all: ormcp-server
 
-# Extract it (use the appropriate version number; e.g., 0.6.x)
-tar -xzf ormcp_server-0.6.x.tar.gz
-cd ormcp_server-0.6.x
+# Extract it (use the appropriate version number; e.g., 0.7.x)
+tar -xzf ormcp_server-0.7.x.tar.gz
+cd ormcp_server-0.7.x
 
 # Now you have access to:
 # - Gilhari_SDK/
@@ -510,7 +510,7 @@ cd ormcp_server-0.6.x
 **Windows users:** If you don't have `tar` installed, you can:
 
 * Use 7-Zip or WinRAR to extract the .tar.gz file
-* Or use PowerShell: `tar -xzf ormcp_server-0.6.x.tar.gz`
+* Or use PowerShell: `tar -xzf ormcp_server-0.7.x.tar.gz`
 * Or download directly from the PyPI project page
 
 **Option 2: Download from Package Page**
@@ -765,7 +765,7 @@ The MCP server running in HTTP mode isn't designed to be accessed directly throu
 ... - INFO - GILHARI BASE URL: http://localhost:80/gilhari/v1/
 🟢 This ORMCP server is configured to expose just the READONLY MCP tools
 ... - INFO - Log file: <temp directory>/ormcp_server_debug.log
-🟢 ORMCP server v0.7.0 starting in stdio (or HTTP) mode ...
+🟢 ORMCP server v0.7.x starting in stdio (or HTTP) mode ...
 ```
 
 If no Gilhari microservice answers at `GILHARI_BASE_URL`, ORMCP stops with a message naming the address it checked, followed by a 💡 "What to do" hint.
@@ -982,9 +982,11 @@ ORMCP Server provides the following MCP tools for interacting with your database
 
 **💡 Working Examples:** See real-world usage examples in the [examples directory](https://github.com/SoftwareTree/ormcp-docs/blob/main/examples).
 
-**Attribute names, not column names:** filters, projections and aggregates use the attribute names shown by `getObjectModelSummary`. Where a database column name contains characters other than letters, digits and `_`, the attribute name replaces them with `_` — e.g. the column `All_Traffic.action` is the attribute `All_Traffic_action`.
+**Attribute names, not column names:** filters, projections and aggregates use attribute names from the object model summary (`getObjectModelSummary`), not database column names.
 
 **Classes without a unique primary key:** a class marked `DB_PRIMARY_KEY_EXISTS FALSE` in the object model summary may have several objects with the same key values. Use `query`, `access`, `getAggregate`, and `update2`/`delete2` with a filter for it; `getObjectById`, `update` and `delete` are not supported.
+
+**Filters:** the `filter` parameter of `query`, `getAggregate`, `update2` and `delete2` is a condition in SQL WHERE-clause syntax (without the word `WHERE`), evaluated in the database — e.g. `isactive = true AND tier IN ('Gold', 'Platinum')`. A `query` filter may end with `ORDER BY` and can test referenced objects with path expressions such as `COUNT(thisObject.listCustomerorder.id) > 10`. See [Filter syntax](https://github.com/softwaretree/ormcp-docs/blob/main/reference/ormcp_tools_reference.md#filter-syntax) for operators, literal formats and examples.
 
 ### Core Operations
 
@@ -1007,7 +1009,7 @@ Query objects with filtering and relationship traversal.
 * `operationDetails` (string, optional): JSON array of operational directives for fine-tuning queries. Supports GraphQL-like operations such as:
   + `projections`: Retrieve only specific attributes
   + `ignore` or `follow`: Control referenced object branches
-  + `filter`: Apply filters to referenced objects
+  + `filters`: Apply filters to referenced objects
 
   Projections must include the class's primary-key attributes, except for classes marked `DB_PRIMARY_KEY_EXISTS FALSE`.
 * `allowDuplicates` (boolean, optional): Return every qualifying row as its own object, even when rows have identical primary key values (default: false; requires Gilhari 0.8.7+)
@@ -1053,6 +1055,12 @@ Calculate aggregate values across objects (COUNT, SUM, AVG, MIN, MAX).
 * `filter` (string, optional): SQL-like WHERE clause to filter objects before aggregation
 
 **Returns:** A single JSON value (e.g. `1000` for COUNT), not a list of objects
+
+#### `get_server_version`
+
+Get the ORMCP Server version.
+
+**Returns:** A JSON object with `version`, `description`, and `gilhari_base_url` (the Gilhari microservice this server uses; added in 0.7.1)
 
 ### Data Modification Operations
 

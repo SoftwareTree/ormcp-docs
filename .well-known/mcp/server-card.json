@@ -1,7 +1,7 @@
 {
   "serverInfo": {
     "name": "ORMCP Server",
-    "version": "0.7.0"
+    "version": "0.7.1"
   },
   "authentication": {
     "required": false
@@ -17,7 +17,7 @@
     },
     {
       "name": "query",
-      "description": "Query all qualifying objects of a particular type (class) based on the filter condition. Returns a JSON array of the qualifying objects (an empty array [] if none qualify).",
+      "description": "Query the qualifying objects of a particular type (class), selected by a filter condition evaluated in the database. Returns a JSON array of the qualifying objects (an empty array [] if none qualify).",
       "inputSchema": {
         "properties": {
           "className": {

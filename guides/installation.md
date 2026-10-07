@@ -59,7 +59,7 @@ pip show ormcp-server
 ormcp-server --version
 
 # Expected output:
-# ORMCP Server v0.7.0
+# ORMCP Server v0.7.x
 
 # Show the command-line options
 ormcp-server --help

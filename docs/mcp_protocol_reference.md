@@ -56,7 +56,7 @@ Send an `initialize` request to establish the connection and negotiate protocol 
     },
     "serverInfo": {
       "name": "ORMCPServerDemo",
-      "version": "0.7.0"
+      "version": "0.7.x"
     },
     "instructions": "IMPORTANT: Before using any data operations, read the resource://object_model_summary resource ..."
   }

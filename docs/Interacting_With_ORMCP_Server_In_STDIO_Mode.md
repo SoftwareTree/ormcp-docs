@@ -54,7 +54,7 @@ Once the ORMCP server is running, you can type JSON-RPC messages directly:
 
 **Call a tool:**
 ```json
-{"jsonrpc":"2.0","id":"3","method":"tools/call","params":{"name":"add","arguments":{"a":5,"b":3}}}
+{"jsonrpc":"2.0","id":"3","method":"tools/call","params":{"name":"get_server_version","arguments":{}}}
 ```
 
 ### Important Notes for Manual Interaction:
@@ -227,18 +227,18 @@ def main():
         })
         tools_response = client.wait_for_response()
         
-        # Call add tool
-        print("\n=== Calling add tool ===")
+        # Call get_server_version tool
+        print("\n=== Calling get_server_version tool ===")
         client.send_message({
             "jsonrpc": "2.0",
             "id": "3",
             "method": "tools/call",
             "params": {
-                "name": "add",
-                "arguments": {"a": 10, "b": 5}
+                "name": "get_server_version",
+                "arguments": {}
             }
         })
-        add_response = client.wait_for_response()
+        version_response = client.wait_for_response()
         
         # Get object model
         print("\n=== Getting object model ===")
@@ -437,8 +437,8 @@ async function main() {
         
         await client.sleep(2000);
         
-        console.log('\n=== Calling add tool ===');
-        await client.callTool('add', {a: 15, b: 25});
+        console.log('\n=== Calling get_server_version tool ===');
+        await client.callTool('get_server_version', {});
         
         await client.sleep(2000);
         

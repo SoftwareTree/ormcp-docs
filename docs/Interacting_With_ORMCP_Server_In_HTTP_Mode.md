@@ -14,7 +14,7 @@ ormcp-server --transport http --port 8080
 
 When it is ready, you'll see output like:
 ```
-🟢 ORMCP server v0.7.0 starting in HTTP mode on 127.0.0.1:8080...
+🟢 ORMCP server v0.7.x starting in HTTP mode on 127.0.0.1:8080...
 INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
 ```
 
@@ -40,7 +40,7 @@ curl -X POST \
 **Expected Response** (shortened):
 ```
 event: message
-data: {"jsonrpc":"2.0","id":"1","result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{"listChanged":true},...},"serverInfo":{"name":"ORMCPServerDemo","version":"0.7.0"},"instructions":"..."}}
+data: {"jsonrpc":"2.0","id":"1","result":{"protocolVersion":"2025-06-18","capabilities":{"tools":{"listChanged":true},...},"serverInfo":{"name":"ORMCPServerDemo","version":"0.7.x"},"instructions":"..."}}
 ```
 
 `serverInfo.version` is the ORMCP Server version (since 0.7.0).

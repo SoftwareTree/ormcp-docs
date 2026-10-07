@@ -172,7 +172,7 @@ ormcp-server
 ... - INFO - ORMCP server name: MyORMCPServer
 ... - INFO - GILHARI BASE URL: http://localhost:80/gilhari/v1/
 ... - INFO - Log file: <temp directory>/ormcp_server_debug.log
-🟢 ORMCP server v0.7.0 starting in stdio mode...
+🟢 ORMCP server v0.7.x starting in stdio mode...
 ```
 
 ### Alternative Start Methods

@@ -36,7 +36,7 @@ Paste any error messages, stack traces, or log output here
 ## Environment
 
 **ORMCP Server:**
-- Version: [output of `ormcp-server --version`, e.g., 0.7.0]
+- Version: [output of `ormcp-server --version`, e.g., 0.7.x]
 - Installation method: [PyPI / source distribution]
 - Transport mode: [STDIO / HTTP]
 

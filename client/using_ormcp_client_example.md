@@ -130,7 +130,7 @@ python -m ormcp_server --transport http --port 8080
 You should see:
 
 ```
-🟢 ORMCP server v0.7.0 starting in HTTP mode on 127.0.0.1:8080...
+🟢 ORMCP server v0.7.x starting in HTTP mode on 127.0.0.1:8080...
 INFO:     Uvicorn running on http://127.0.0.1:8080 (Press CTRL+C to quit)
 ```
 
